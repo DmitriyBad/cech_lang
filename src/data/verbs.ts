@@ -22,18 +22,43 @@ const createOptions = (correctAnswer: string, alternatives: string[]) => {
 const pickAlternatives = (correctAnswer: string, candidates: string[], count = 2) =>
   Array.from(new Set(candidates.filter((item) => item && item !== correctAnswer))).slice(0, count);
 
+const removeFinalPunctuation = (sentence: string) => sentence.trim().replace(/[.!?]+$/, "");
+
+const lowerFirst = (sentence: string, locale: string) => {
+  const trimmedSentence = removeFinalPunctuation(sentence);
+  return trimmedSentence.charAt(0).toLocaleLowerCase(locale) + trimmedSentence.slice(1);
+};
+
+const toCzechSubordinateClause = (sentence: string) =>
+  lowerFirst(sentence, "cs-CZ").replace(/^(já|ty|my|vy|oni|ony)\s+/i, "");
+
 const buildExamples = (verb: VerbSeed): Example[] => {
-  const formExamples = personPrompts.map(({ label, key, ua }) => ({
-    cz: "Forma pro “" + label + "” u slovesa “" + verb.infinitive + "” je “" + verb.conjugation[key] + "”.",
-    ua: "Форма для “" + label + "” (" + ua + ") у дієслові “" + verb.translation + "” — “" + verb.conjugation[key] + "”.",
-  }));
+  const expandedExamples = verb.examples.flatMap((example) => {
+    const czClause = toCzechSubordinateClause(example.cz);
+    const uaClause = lowerFirst(example.ua, "uk-UA");
 
-  const practiceExamples = personPrompts.map(({ label, key, ua }) => ({
-    cz: "Dnes procvičuju “" + label + " " + verb.conjugation[key] + "” se slovesem “" + verb.infinitive + "”.",
-    ua: "Сьогодні я треную “" + label + " " + verb.conjugation[key] + "” з дієсловом “" + verb.translation + "” (" + ua + ").",
-  }));
+    return [
+      example,
+      {
+        cz: "Myslím, že " + czClause + ".",
+        ua: "Думаю, що " + uaClause + ".",
+      },
+      {
+        cz: "Vím, že " + czClause + ", ale chci si to ještě ověřit.",
+        ua: "Я знаю, що " + uaClause + ", але хочу ще це перевірити.",
+      },
+      {
+        cz: "Řekl jsem učiteli, že " + czClause + ".",
+        ua: "Я сказав учителю, що " + uaClause + ".",
+      },
+      {
+        cz: "Když se mě někdo ptá, odpovím klidně, že " + czClause + ".",
+        ua: "Коли мене хтось питає, я спокійно відповідаю, що " + uaClause + ".",
+      },
+    ];
+  });
 
-  return [...verb.examples, ...formExamples, ...practiceExamples].slice(0, 15);
+  return expandedExamples.slice(0, 15);
 };
 
 const buildExercises = (verb: VerbSeed, allVerbs: VerbSeed[]): Exercise[] => {
