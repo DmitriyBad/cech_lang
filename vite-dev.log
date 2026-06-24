@@ -1,0 +1,49 @@
+
+> czech-learning-app@0.1.0 dev
+> vite "--host" "127.0.0.1" "--port" "5173"
+
+
+  [32m[1mVITE[22m v4.5.14[39m  [2mready in [0m[1m835[22m[2m[0m ms[22m
+
+  [32m➜[39m  [1mLocal[22m:   [36mhttp://127.0.0.1:[1m5173[22m/[39m
+[2m23:56:54[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mindex.html[22m
+[2m23:56:54[22m [36m[1m[vite][22m[39m changed tsconfig file detected: F:\AI\cech_lang\tsconfig.json - Clearing cache and forcing full-reload to ensure TypeScript is compiled with updated config values.
+[2m23:56:54[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mtailwind.config.js[22m
+[2m23:56:54[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2msrc/main.tsx[22m
+[2m23:56:54[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2msrc/types/Verb.ts[22m
+[2m23:56:54[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/index.css[22m
+[2m23:56:54[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css[22m
+[2m23:56:54[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/VerbPage.tsx, /src/pages/StatisticsPage.tsx, /src/components/Header.tsx, /src/pages/ExercisePage.tsx, /src/pages/HomePage.tsx[22m
+[2m23:56:54[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/VerbPage.tsx, /src/pages/StatisticsPage.tsx, /src/components/Header.tsx, /src/pages/ExercisePage.tsx, /src/pages/HomePage.tsx[22m
+[2m23:56:54[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/Header.tsx, /src/index.css[22m
+[2m23:56:54[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/Footer.tsx, /src/index.css[22m
+[2m23:56:54[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/SearchBar.tsx, /src/index.css[22m
+[2m23:56:54[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/VerbCard.tsx, /src/index.css[22m
+[2m23:56:54[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/ConjugationTable.tsx, /src/index.css[22m
+[2m23:56:54[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/HomePage.tsx, /src/index.css[22m
+[2m23:56:54[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/ExamplesList.tsx, /src/index.css[22m
+[2m23:56:54[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/ExerciseBlock.tsx, /src/index.css[22m
+[2m23:56:54[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/ProgressBar.tsx, /src/index.css[22m
+[2m23:56:54[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/VerbPage.tsx, /src/pages/StatisticsPage.tsx, /src/components/Header.tsx, /src/pages/ExercisePage.tsx, /src/pages/HomePage.tsx[22m
+[2m23:56:54[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/VerbPage.tsx, /src/index.css[22m
+[2m23:56:54[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/ExercisePage.tsx, /src/index.css[22m
+[2m23:56:54[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/StatisticsPage.tsx, /src/index.css[22m
+[2m23:58:25[22m [36m[1m[vite][22m[39m [32mvite.config.js changed, restarting server...[39m
+[2m23:58:26[22m [36m[1m[vite][22m[39m server restarted.
+[2m23:58:49[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mdist/index.html[22m
+[2m00:40:03[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css, /src/components/Header.tsx, /src/pages/ExercisePage.tsx, /src/pages/VerbPage.tsx, /src/pages/StatisticsPage.tsx, /src/pages/HomePage.tsx[22m
+[2m00:53:47[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2msrc/main.tsx[22m
+[2m00:53:47[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css, /src/components/Header.tsx, /src/pages/ExercisePage.tsx, /src/pages/VerbPage.tsx, /src/pages/StatisticsPage.tsx, /src/pages/HomePage.tsx[22m
+[2m00:53:47[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css, /src/components/Header.tsx, /src/pages/ExercisePage.tsx, /src/pages/VerbPage.tsx, /src/pages/StatisticsPage.tsx, /src/pages/HomePage.tsx[22m
+[2m00:53:47[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/HomePage.tsx, /src/index.css[22m
+[2m00:53:47[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/Header.tsx, /src/index.css[22m
+[2m00:53:47[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/VerbCard.tsx, /src/index.css[22m
+[2m00:53:47[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css, /src/components/Header.tsx, /src/pages/ExercisePage.tsx, /src/pages/VerbPage.tsx, /src/pages/StatisticsPage.tsx, /src/pages/HomePage.tsx[22m
+[2m00:53:47[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/VerbPage.tsx, /src/index.css[22m
+[2m00:53:47[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/ExercisePage.tsx, /src/index.css[22m
+[2m00:53:47[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/StatisticsPage.tsx, /src/index.css[22m
+[2m00:54:06[22m [36m[1m[vite][22m[39m [32mvite.config.js changed, restarting server...[39m
+[2m00:54:06[22m [36m[1m[vite][22m[39m server restarted.
+
+  [32m➜[39m  [1mLocal[22m:   [36mhttp://127.0.0.1:[1m5173[22m/cech_lang/[39m
+[2m00:55:38[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mdist/index.html[22m
