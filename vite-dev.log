@@ -49,3 +49,24 @@
 [2m00:55:38[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mdist/index.html[22m
 [2m01:22:04[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/ExercisePage.tsx, /src/pages/VerbPage.tsx, /src/components/Header.tsx, /src/pages/HomePage.tsx, /src/pages/StatisticsPage.tsx[22m
 [2m01:24:08[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/ExercisePage.tsx, /src/pages/VerbPage.tsx, /src/components/Header.tsx, /src/pages/HomePage.tsx, /src/pages/StatisticsPage.tsx[22m
+[2m09:29:01[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/ExercisePage.tsx, /src/pages/VerbPage.tsx, /src/components/Header.tsx, /src/pages/HomePage.tsx, /src/pages/StatisticsPage.tsx[22m
+[2m09:30:33[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/ExercisePage.tsx, /src/pages/VerbPage.tsx, /src/components/Header.tsx, /src/pages/HomePage.tsx, /src/pages/StatisticsPage.tsx[22m
+[2m10:16:11[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/Header.tsx, /src/index.css[22m
+[2m10:16:11[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/ExercisePage.tsx, /src/pages/VerbPage.tsx, /src/components/Header.tsx, /src/pages/HomePage.tsx, /src/pages/StatisticsPage.tsx[22m
+[2m10:16:11[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/ExercisePage.tsx, /src/pages/VerbPage.tsx, /src/components/Header.tsx, /src/pages/HomePage.tsx, /src/pages/StatisticsPage.tsx[22m
+[2m10:16:11[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/StatisticsPage.tsx, /src/index.css[22m
+[2m10:16:11[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/index.css[22m
+[2m10:16:52[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/StatisticsPage.tsx, /src/pages/ModulePage.tsx, /src/pages/ModuleExercisePage.tsx, /src/pages/ModulesPage.tsx[22m
+[2m10:20:34[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/StatisticsPage.tsx, /src/pages/NounExercisePage.tsx, /src/pages/NounPage.tsx, /src/pages/NounsPage.tsx, /src/components/NounDeclensionTable.tsx[22m
+[2m10:43:00[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/StatisticsPage.tsx, /src/pages/ModulePage.tsx, /src/pages/ModuleExercisePage.tsx, /src/pages/ModulesPage.tsx[22m
+[2m10:43:00[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/App.tsx, /src/index.css[22m
+[2m11:05:25[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2msrc/types/Lesson.ts[22m
+[2m11:05:25[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/StatisticsPage.tsx, /src/pages/NounExercisePage.tsx, /src/pages/NounPage.tsx, /src/pages/NounsPage.tsx, /src/components/NounDeclensionTable.tsx[22m
+[2m11:05:25[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/NounDeclensionTable.tsx, /src/index.css[22m
+[2m11:05:25[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/StatisticsPage.tsx, /src/pages/ModulePage.tsx, /src/pages/ModuleExercisePage.tsx, /src/pages/ModulesPage.tsx, /src/pages/ModuleOverviewPage.tsx[22m
+[2m11:05:25[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/ModulePage.tsx, /src/index.css[22m
+[2m11:05:25[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/ExerciseBlock.tsx, /src/index.css[22m
+[2m11:05:25[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/ModuleOverviewPage.tsx, /src/index.css[22m
+[2m11:15:59[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2msrc/types/Lesson.ts[22m
+[2m11:15:59[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/index.css, /src/pages/StatisticsPage.tsx, /src/pages/ModulePage.tsx, /src/pages/ModuleExercisePage.tsx, /src/pages/ModulesPage.tsx, /src/pages/ModuleOverviewPage.tsx[22m
+[2m11:15:59[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/ModuleOverviewPage.tsx, /src/index.css[22m

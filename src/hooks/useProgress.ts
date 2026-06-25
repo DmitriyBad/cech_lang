@@ -76,6 +76,90 @@ export function useProgress(totalVerbs = 0) {
     [updateProgress],
   );
 
+  const markModuleItemLearned = useCallback(
+    (moduleId: string, itemId: string) => {
+      updateProgress((current) => {
+        const currentModule = current.moduleProgress[moduleId] ?? {
+          completedItemIds: [],
+          correctAnswers: 0,
+          wrongAnswers: 0,
+          mistakesByItemId: {},
+        };
+
+        if (currentModule.completedItemIds.includes(itemId)) {
+          return current;
+        }
+
+        return {
+          ...current,
+          moduleProgress: {
+            ...current.moduleProgress,
+            [moduleId]: {
+              ...currentModule,
+              completedItemIds: [...currentModule.completedItemIds, itemId],
+            },
+          },
+        };
+      });
+    },
+    [updateProgress],
+  );
+
+  const registerModuleAnswer = useCallback(
+    (moduleId: string, itemId: string, isCorrect: boolean) => {
+      updateProgress((current) => {
+        const currentModule = current.moduleProgress[moduleId] ?? {
+          completedItemIds: [],
+          correctAnswers: 0,
+          wrongAnswers: 0,
+          mistakesByItemId: {},
+        };
+
+        return {
+          ...current,
+          correctAnswers: current.correctAnswers + (isCorrect ? 1 : 0),
+          wrongAnswers: current.wrongAnswers + (isCorrect ? 0 : 1),
+          moduleProgress: {
+            ...current.moduleProgress,
+            [moduleId]: {
+              ...currentModule,
+              correctAnswers: currentModule.correctAnswers + (isCorrect ? 1 : 0),
+              wrongAnswers: currentModule.wrongAnswers + (isCorrect ? 0 : 1),
+              mistakesByItemId: isCorrect
+                ? currentModule.mistakesByItemId
+                : {
+                    ...currentModule.mistakesByItemId,
+                    [itemId]: (currentModule.mistakesByItemId[itemId] ?? 0) + 1,
+                  },
+            },
+          },
+        };
+      });
+    },
+    [updateProgress],
+  );
+
+  const getModuleStats = useCallback(
+    (moduleId: string, totalItems = 0) => {
+      const moduleProgress = progress.moduleProgress[moduleId] ?? {
+        completedItemIds: [],
+        correctAnswers: 0,
+        wrongAnswers: 0,
+        mistakesByItemId: {},
+      };
+      const totalModuleAnswers = moduleProgress.correctAnswers + moduleProgress.wrongAnswers;
+
+      return {
+        ...moduleProgress,
+        learnedCount: moduleProgress.completedItemIds.length,
+        learnedPercent: totalItems === 0 ? 0 : Math.round((moduleProgress.completedItemIds.length / totalItems) * 100),
+        successRate: totalModuleAnswers === 0 ? 0 : Math.round((moduleProgress.correctAnswers / totalModuleAnswers) * 100),
+        totalAnswers: totalModuleAnswers,
+      };
+    },
+    [progress.moduleProgress],
+  );
+
   const resetProgress = useCallback(() => {
     const nickname = loadActiveNickname();
     resetStoredProgress(nickname);
@@ -107,6 +191,9 @@ export function useProgress(totalVerbs = 0) {
     reviewVerbIds,
     markVerbLearned,
     registerAnswer,
+    getModuleStats,
+    markModuleItemLearned,
+    registerModuleAnswer,
     resetProgress,
   };
 }

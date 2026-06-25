@@ -22,39 +22,71 @@ const createOptions = (correctAnswer: string, alternatives: string[]) => {
 const pickAlternatives = (correctAnswer: string, candidates: string[], count = 2) =>
   Array.from(new Set(candidates.filter((item) => item && item !== correctAnswer))).slice(0, count);
 
-const removeFinalPunctuation = (sentence: string) => sentence.trim().replace(/[.!?]+$/, "");
+const cleanSentence = (sentence: string) => sentence.trim().replace(/[.!?]+$/, "");
 
-const lowerFirst = (sentence: string, locale: string) => {
-  const trimmedSentence = removeFinalPunctuation(sentence);
-  return trimmedSentence.charAt(0).toLocaleLowerCase(locale) + trimmedSentence.slice(1);
-};
-
-const toCzechSubordinateClause = (sentence: string) =>
-  lowerFirst(sentence, "cs-CZ").replace(/^(já|ty|my|vy|oni|ony)\s+/i, "");
+const sceneTemplates = [
+  {
+    cz: (sentence: string) => "Ráno u snídaně říkám nahlas: „" + sentence + ".“",
+    ua: (sentence: string) => "Вранці за сніданком я вимовляю вголос: “" + sentence + ".”",
+  },
+  {
+    cz: (sentence: string) => "V mobilu si ukládám krátkou poznámku: „" + sentence + ".“",
+    ua: (sentence: string) => "У телефоні я зберігаю коротку нотатку: “" + sentence + ".”",
+  },
+  {
+    cz: (sentence: string) => "V malé kavárně slyším od sousedního stolu: „" + sentence + ".“",
+    ua: (sentence: string) => "У маленькій кав'ярні я чую із сусіднього столика: “" + sentence + ".”",
+  },
+  {
+    cz: (sentence: string) => "Kamarád se usměje a odpoví: „" + sentence + ".“",
+    ua: (sentence: string) => "Друг усміхається і відповідає: “" + sentence + ".”",
+  },
+  {
+    cz: (sentence: string) => "Cestou tramvají si potichu opakuju větu: „" + sentence + ".“",
+    ua: (sentence: string) => "Дорогою в трамваї я тихо повторюю речення: “" + sentence + ".”",
+  },
+  {
+    cz: (sentence: string) => "Ve zprávě kamarádovi píšu: „" + sentence + ".“",
+    ua: (sentence: string) => "У повідомленні другові я пишу: “" + sentence + ".”",
+  },
+  {
+    cz: (sentence: string) => "Na kurzu češtiny skládáme malý dialog a jedna věta zní: „" + sentence + ".“",
+    ua: (sentence: string) => "На курсі чеської ми складаємо маленький діалог, і одне речення звучить так: “" + sentence + ".”",
+  },
+  {
+    cz: (sentence: string) => "Učitel na tabuli dopíše nový příklad: „" + sentence + ".“",
+    ua: (sentence: string) => "Учитель дописує на дошці новий приклад: “" + sentence + ".”",
+  },
+  {
+    cz: (sentence: string) => "Večer doma čtu v sešitě větu: „" + sentence + ".“",
+    ua: (sentence: string) => "Увечері вдома я читаю в зошиті речення: “" + sentence + ".”",
+  },
+  {
+    cz: (sentence: string) => "Při plánování výletu někdo řekne: „" + sentence + ".“",
+    ua: (sentence: string) => "Під час планування поїздки хтось каже: “" + sentence + ".”",
+  },
+  {
+    cz: (sentence: string) => "V rychlém rozhovoru na ulici zazní: „" + sentence + ".“",
+    ua: (sentence: string) => "У швидкій розмові на вулиці лунає: “" + sentence + ".”",
+  },
+  {
+    cz: (sentence: string) => "Když píšu krátký příběh, použiju větu: „" + sentence + ".“",
+    ua: (sentence: string) => "Коли я пишу коротку історію, використовую речення: “" + sentence + ".”",
+  },
+];
 
 const buildExamples = (verb: VerbSeed): Example[] => {
-  const expandedExamples = verb.examples.flatMap((example) => {
-    const czClause = toCzechSubordinateClause(example.cz);
-    const uaClause = lowerFirst(example.ua, "uk-UA");
+  const expandedExamples = verb.examples.flatMap((example, index) => {
+    const czSentence = cleanSentence(example.cz);
+    const uaSentence = cleanSentence(example.ua);
+    const sceneOffset = index * 4;
 
     return [
       example,
-      {
-        cz: "Myslím, že " + czClause + ".",
-        ua: "Думаю, що " + uaClause + ".",
-      },
-      {
-        cz: "Vím, že " + czClause + ", ale chci si to ještě ověřit.",
-        ua: "Я знаю, що " + uaClause + ", але хочу ще це перевірити.",
-      },
-      {
-        cz: "Řekl jsem učiteli, že " + czClause + ".",
-        ua: "Я сказав учителю, що " + uaClause + ".",
-      },
-      {
-        cz: "Když se mě někdo ptá, odpovím klidně, že " + czClause + ".",
-        ua: "Коли мене хтось питає, я спокійно відповідаю, що " + uaClause + ".",
-      },
+      ...sceneTemplates.slice(sceneOffset, sceneOffset + 4).map((template) => ({
+        cz: template.cz(czSentence),
+        ua: template.ua(uaSentence),
+      })),
     ];
   });
 

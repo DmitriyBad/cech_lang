@@ -14,6 +14,7 @@ export default function ExerciseBlock({ exercise, index, onAnswer }: ExerciseBlo
   const isCorrect = selectedAnswer === exercise.correctAnswer;
 
   const options = useMemo(() => exercise.options, [exercise.options]);
+  const [questionTitle, ...questionDetails] = exercise.question.split("\n");
 
   const handleAnswer = (answer: string) => {
     if (isAnswered) {
@@ -29,7 +30,14 @@ export default function ExerciseBlock({ exercise, index, onAnswer }: ExerciseBlo
       <div className="flex items-start gap-3">
         <span className="grid h-8 w-8 shrink-0 place-items-center rounded-md bg-blue-50 text-sm font-semibold text-blue-700">{index + 1}</span>
         <div className="min-w-0 flex-1">
-          <h3 className="text-base font-semibold text-slate-950">{exercise.question}</h3>
+          <h3 className="text-base font-semibold text-slate-950">{questionTitle}</h3>
+          {questionDetails.length > 0 ? (
+            <div className="mt-3 rounded-md bg-slate-50 px-3 py-2 text-lg font-semibold text-slate-950">
+              {questionDetails.map((line) => (
+                <p key={line}>{line}</p>
+              ))}
+            </div>
+          ) : null}
 
           <div className="mt-4 grid gap-2 sm:grid-cols-3">
             {options.map((option) => {

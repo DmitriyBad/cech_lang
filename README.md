@@ -17,3 +17,11 @@ The project is configured for GitHub Pages with:
 - GitHub Actions workflow: .github/workflows/deploy.yml
 
 In the GitHub repository, open Settings -> Pages and choose GitHub Actions as the source.
+
+
+## Learning Modules
+
+- Czech verbs A1-A2
+- 100 Czech nouns with 7 cases, singular/plural, examples, and exercises
+- Grammar modules: singular/plural, numbers, dates/time, adjectives, prepositions, and life scenarios
+- Local nickname-based progress in localStorage

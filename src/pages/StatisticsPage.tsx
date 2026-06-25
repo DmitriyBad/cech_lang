@@ -2,12 +2,15 @@ import { RotateCcw, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import NicknameNotice from "../components/NicknameNotice";
 import ProgressBar from "../components/ProgressBar";
+import { grammarModules } from "../data/grammarModules";
+import { nouns } from "../data/nouns";
 import { verbs } from "../data/verbs";
 import { useProgress } from "../hooks/useProgress";
 
 export default function StatisticsPage() {
   const {
     activeNickname,
+    getModuleStats,
     isLearningLocked,
     progress,
     learnedCount,
@@ -18,6 +21,11 @@ export default function StatisticsPage() {
   } = useProgress(verbs.length);
 
   const reviewVerbs = verbs.filter((verb) => reviewVerbIds.includes(verb.id));
+  const moduleRows = [
+    { id: "verbs", title: "Дієслова", learnedCount, learnedPercent, correctAnswers: progress.correctAnswers, wrongAnswers: progress.wrongAnswers },
+    { id: "nouns", title: "Іменники", ...getModuleStats("nouns", nouns.length) },
+    ...grammarModules.map((module) => ({ id: module.id, title: module.title, ...getModuleStats(module.id, module.lessons.length) })),
+  ];
 
   return (
     <div className="space-y-6">
@@ -40,12 +48,12 @@ export default function StatisticsPage() {
 
       <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-soft">
-          <p className="text-sm text-slate-500">Загальна кількість дієслів</p>
+          <p className="text-sm text-slate-500">Дієслова</p>
           <p className="mt-1 text-2xl font-bold text-slate-950">{verbs.length}</p>
         </div>
         <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-soft">
-          <p className="text-sm text-slate-500">Вивчені дієслова</p>
-          <p className="mt-1 text-2xl font-bold text-slate-950">{learnedCount}</p>
+          <p className="text-sm text-slate-500">Іменники</p>
+          <p className="mt-1 text-2xl font-bold text-slate-950">{nouns.length}</p>
         </div>
         <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-soft">
           <p className="text-sm text-slate-500">Правильні відповіді</p>
@@ -62,7 +70,25 @@ export default function StatisticsPage() {
       </section>
 
       <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-soft">
-        <ProgressBar value={learnedPercent} label="Загальний прогрес" />
+        <ProgressBar value={learnedPercent} label="Прогрес дієслів" />
+      </section>
+
+      <section className="space-y-3">
+        <h2 className="text-xl font-semibold text-slate-950">Прогрес по модулях</h2>
+        <div className="grid gap-3 lg:grid-cols-2">
+          {moduleRows.map((module) => (
+            <article key={module.id} className="rounded-lg border border-slate-200 bg-white p-4 shadow-soft">
+              <div className="mb-3 flex items-center justify-between gap-3">
+                <h3 className="font-semibold text-slate-950">{module.title}</h3>
+                <span className="text-sm text-slate-500">{module.learnedCount} вивчено</span>
+              </div>
+              <ProgressBar value={module.learnedPercent} />
+              <p className="mt-3 text-xs text-slate-500">
+                Правильно: {module.correctAnswers ?? 0} · Неправильно: {module.wrongAnswers ?? 0}
+              </p>
+            </article>
+          ))}
+        </div>
       </section>
 
       <section className="space-y-3">

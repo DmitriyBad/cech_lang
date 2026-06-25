@@ -1,8 +1,16 @@
+export interface ModuleProgress {
+  completedItemIds: string[];
+  correctAnswers: number;
+  wrongAnswers: number;
+  mistakesByItemId: Record<string, number>;
+}
+
 export interface StoredProgress {
   learnedVerbIds: number[];
   correctAnswers: number;
   wrongAnswers: number;
   mistakesByVerbId: Record<number, number>;
+  moduleProgress: Record<string, ModuleProgress>;
 }
 
 type ProgressByNickname = Record<string, StoredProgress>;
@@ -11,11 +19,19 @@ const ACTIVE_NICKNAME_KEY = "czech-learning-active-nickname-v1";
 const PROGRESS_BY_NICKNAME_KEY = "czech-learning-progress-by-nickname-v1";
 const PROGRESS_EVENT = "czech-learning-progress-updated";
 
+export const emptyModuleProgress: ModuleProgress = {
+  completedItemIds: [],
+  correctAnswers: 0,
+  wrongAnswers: 0,
+  mistakesByItemId: {},
+};
+
 export const emptyProgress: StoredProgress = {
   learnedVerbIds: [],
   correctAnswers: 0,
   wrongAnswers: 0,
   mistakesByVerbId: {},
+  moduleProgress: {},
 };
 
 const hasStorage = () => typeof window !== "undefined" && Boolean(window.localStorage);
@@ -24,6 +40,16 @@ export const normalizeNickname = (nickname: string) => nickname.trim().replace(/
 
 const nicknameKey = (nickname: string) => normalizeNickname(nickname).toLocaleLowerCase("uk-UA");
 
+const normalizeModuleProgress = (value: Partial<ModuleProgress> | null | undefined): ModuleProgress => ({
+  completedItemIds: Array.isArray(value?.completedItemIds) ? value.completedItemIds.map(String) : [],
+  correctAnswers: Number.isFinite(value?.correctAnswers) ? Number(value?.correctAnswers) : 0,
+  wrongAnswers: Number.isFinite(value?.wrongAnswers) ? Number(value?.wrongAnswers) : 0,
+  mistakesByItemId:
+    value?.mistakesByItemId && typeof value.mistakesByItemId === "object"
+      ? value.mistakesByItemId
+      : {},
+});
+
 const normalizeProgress = (value: Partial<StoredProgress> | null | undefined): StoredProgress => ({
   learnedVerbIds: Array.isArray(value?.learnedVerbIds) ? value.learnedVerbIds : [],
   correctAnswers: Number.isFinite(value?.correctAnswers) ? Number(value?.correctAnswers) : 0,
@@ -31,6 +57,15 @@ const normalizeProgress = (value: Partial<StoredProgress> | null | undefined): S
   mistakesByVerbId:
     value?.mistakesByVerbId && typeof value.mistakesByVerbId === "object"
       ? value.mistakesByVerbId
+      : {},
+  moduleProgress:
+    value?.moduleProgress && typeof value.moduleProgress === "object"
+      ? Object.fromEntries(
+          Object.entries(value.moduleProgress).map(([moduleId, progress]) => [
+            moduleId,
+            normalizeModuleProgress(progress),
+          ]),
+        )
       : {},
 });
 

@@ -1,4 +1,4 @@
-import { BarChart3, BookOpen, Home, Save, UserRound } from "lucide-react";
+import { BarChart3, BookMarked, BookOpen, Grid2X2, Home, Save, UserRound } from "lucide-react";
 import { FormEvent, useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { verbs } from "../data/verbs";
@@ -25,14 +25,14 @@ export default function Header() {
 
   return (
     <header className="border-b border-slate-200 bg-white">
-      <div className="mx-auto grid w-full max-w-7xl gap-3 px-4 py-3 sm:px-6 lg:grid-cols-[auto_minmax(280px,420px)_auto] lg:items-center lg:px-8">
+      <div className="mx-auto grid w-full max-w-7xl gap-3 px-4 py-3 sm:px-6 xl:grid-cols-[auto_minmax(260px,390px)_auto] xl:items-center xl:px-8">
         <NavLink to="/" className="focus-ring flex w-fit items-center gap-3 rounded-md">
           <span className="grid h-10 w-10 place-items-center rounded-md bg-blue-600 text-white">
             <BookOpen size={22} aria-hidden="true" />
           </span>
           <span>
             <span className="block text-base font-semibold text-slate-950">Česky A1-A2</span>
-            <span className="block text-xs text-slate-500">{learnedCount} / {verbs.length} вивчено · {learnedPercent}%</span>
+            <span className="block text-xs text-slate-500">{learnedCount} / {verbs.length} дієслів · {learnedPercent}%</span>
           </span>
         </NavLink>
 
@@ -50,19 +50,24 @@ export default function Header() {
               maxLength={32}
             />
           </label>
-          <button
-            type="submit"
-            className="focus-ring inline-flex min-h-10 shrink-0 items-center justify-center gap-2 rounded-md bg-blue-600 px-3 text-sm font-semibold text-white transition hover:bg-blue-700"
-          >
+          <button type="submit" className="focus-ring inline-flex min-h-10 shrink-0 items-center justify-center gap-2 rounded-md bg-blue-600 px-3 text-sm font-semibold text-white transition hover:bg-blue-700">
             <Save size={17} aria-hidden="true" />
             Зберегти
           </button>
         </form>
 
-        <nav className="flex gap-2 overflow-x-auto pb-1 lg:justify-end lg:pb-0" aria-label="Основна навігація">
+        <nav className="flex gap-2 overflow-x-auto pb-1 xl:justify-end xl:pb-0" aria-label="Основна навігація">
           <NavLink to="/" className={navLinkClass} end>
             <Home size={18} aria-hidden="true" />
             Головна
+          </NavLink>
+          <NavLink to="/nouns" className={navLinkClass}>
+            <BookMarked size={18} aria-hidden="true" />
+            Іменники
+          </NavLink>
+          <NavLink to="/modules" className={navLinkClass}>
+            <Grid2X2 size={18} aria-hidden="true" />
+            Граматика
           </NavLink>
           <NavLink to="/statistics" className={navLinkClass}>
             <BarChart3 size={18} aria-hidden="true" />
