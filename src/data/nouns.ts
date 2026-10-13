@@ -1249,21 +1249,21 @@ const decline = (seed: NounSeed): { singular: NounCaseForms; plural: NounCaseFor
       return {
         singular: {
           nominative: seed.noun,
-          genitive: seed.noun + "u",
-          dative: seed.noun + "u",
+          genitive: seed.stem + "u",
+          dative: seed.stem + "u",
           accusative: seed.noun,
           vocative: seed.noun,
           locative: seed.locativeSingular,
-          instrumental: seed.noun + "em",
+          instrumental: seed.stem + "em",
         },
         plural: {
           nominative: seed.nominativePlural,
-          genitive: seed.noun + "ů",
-          dative: seed.noun + "ům",
+          genitive: seed.stem + "ů",
+          dative: seed.stem + "ům",
           accusative: seed.nominativePlural,
           vocative: seed.nominativePlural,
-          locative: seed.noun + "ech",
-          instrumental: seed.noun + "y",
+          locative: seed.stem + "ech",
+          instrumental: seed.stem + "y",
         },
       };
   }
@@ -1368,8 +1368,65 @@ const buildExercises = (noun: Pick<Noun, "noun" | "translation" | "singular" | "
   },
 ];
 
+// Винятки, які не покриваються парадигмами вище (чергування -k/-h → -c/-z, нульове закінчення
+// родового відмінка множини з вставним -e-, м'які основи тощо). Ключ — слово в називному відмінку.
+// TODO: перейти на явне задання всіх 14 форм для кожного слова (див. IMPROVEMENTS.md).
+type FormOverrides = { singular?: Partial<NounCaseForms>; plural?: Partial<NounCaseForms> };
+
+const formOverrides: Record<string, FormOverrides> = {
+  // вокатив
+  bratr: { singular: { vocative: "bratře" }, plural: { locative: "bratřích" } },
+  syn: { singular: { vocative: "synu" } },
+  číšník: { singular: { vocative: "číšníku" } },
+  pracovník: { singular: { vocative: "pracovníku" } },
+  // -ek / -ec: випадний голосний
+  účet: {
+    singular: { genitive: "účtu", dative: "účtu", instrumental: "účtem" },
+    plural: { genitive: "účtů", dative: "účtům", locative: "účtech" },
+  },
+  // локатив множини на -ích після k/h
+  park: { plural: { locative: "parcích" } },
+  vlak: { plural: { locative: "vlacích" } },
+  jazyk: { plural: { locative: "jazycích" } },
+  batoh: { plural: { locative: "batozích" } },
+  lístek: { plural: { locative: "lístcích" } },
+  obrázek: { plural: { locative: "obrázcích" } },
+  dárek: { plural: { locative: "dárcích" } },
+  // родовий відмінок множини жіночого роду на -a (вставний -e-)
+  taška: { plural: { genitive: "tašek" } },
+  otázka: { plural: { genitive: "otázek" } },
+  zastávka: { plural: { genitive: "zastávek" } },
+  kavárna: { plural: { genitive: "kaváren" } },
+  lékárna: { plural: { genitive: "lékáren" } },
+  koupelna: { plural: { genitive: "koupelen" } },
+  karta: { plural: { genitive: "karet" } },
+  // жіночий рід на -e / -ě / -ie
+  práce: { plural: { genitive: "prací" } },
+  restaurace: { plural: { genitive: "restaurací" } },
+  lekce: { plural: { genitive: "lekcí" } },
+  kuchyně: { plural: { genitive: "kuchyní" } },
+  fotografie: { plural: { genitive: "fotografií" } },
+  informace: { plural: { genitive: "informací" } },
+  // середній рід
+  okno: { plural: { genitive: "oken" } },
+  jídlo: { plural: { genitive: "jídel" } },
+  číslo: { plural: { genitive: "čísel" } },
+  letadlo: { plural: { genitive: "letadel" } },
+  divadlo: { plural: { genitive: "divadel" } },
+  parkoviště: { plural: { genitive: "parkovišť" } },
+  letiště: { plural: { genitive: "letišť" } },
+  hřiště: { plural: { genitive: "hřišť" } },
+  moře: { plural: { genitive: "moří" } },
+};
+
 export const nouns: Noun[] = nounSeeds.map((seed, index) => {
-  const forms = decline(seed);
+  const declined = decline(seed);
+  const overrides = formOverrides[seed.noun];
+  const forms = {
+    ...declined,
+    singular: { ...declined.singular, ...overrides?.singular },
+    plural: { ...declined.plural, ...overrides?.plural },
+  };
   const baseNoun = {
     id: index + 1,
     noun: seed.noun,

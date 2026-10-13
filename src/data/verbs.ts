@@ -2936,29 +2936,29 @@ const verbBase = [
   },
   {
     "id": 100,
-    "infinitive": "jet",
-    "translation": "їхати транспортом",
-    "level": "A2",
+    "infinitive": "volat",
+    "translation": "кликати, телефонувати",
+    "level": "A1",
     "conjugation": {
-      "ja": "jedu",
-      "ty": "jedeš",
-      "on": "jede",
-      "my": "jedeme",
-      "vy": "jedete",
-      "oni": "jedou"
+      "ja": "volám",
+      "ty": "voláš",
+      "on": "volá",
+      "my": "voláme",
+      "vy": "voláte",
+      "oni": "volají"
     },
     "examples": [
       {
-        "cz": "Já jedu metrem do centra.",
-        "ua": "Я їду метро до центру."
+        "cz": "Já volám lékaře.",
+        "ua": "Я викликаю лікаря."
       },
       {
-        "cz": "Ty jedeš autem na nákup.",
-        "ua": "Ти їдеш автомобілем за покупками."
+        "cz": "Ty voláš kamaráda.",
+        "ua": "Ти кличеш друга."
       },
       {
-        "cz": "My jedeme tramvají na náměstí.",
-        "ua": "Ми їдемо трамваєм на площу."
+        "cz": "My voláme taxi.",
+        "ua": "Ми викликаємо таксі."
       }
     ]
   }

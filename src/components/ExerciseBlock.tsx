@@ -13,7 +13,17 @@ export default function ExerciseBlock({ exercise, index, onAnswer }: ExerciseBlo
   const isAnswered = selectedAnswer !== null;
   const isCorrect = selectedAnswer === exercise.correctAnswer;
 
-  const options = useMemo(() => exercise.options, [exercise.options]);
+  // Fisher–Yates: правильна відповідь не повинна завжди стояти першою.
+  const options = useMemo(() => {
+    const shuffled = [...exercise.options];
+
+    for (let i = shuffled.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+
+    return shuffled;
+  }, [exercise.options]);
   const [questionTitle, ...questionDetails] = exercise.question.split("\n");
 
   const handleAnswer = (answer: string) => {
@@ -33,8 +43,8 @@ export default function ExerciseBlock({ exercise, index, onAnswer }: ExerciseBlo
           <h3 className="text-base font-semibold text-slate-950">{questionTitle}</h3>
           {questionDetails.length > 0 ? (
             <div className="mt-3 rounded-md bg-slate-50 px-3 py-2 text-lg font-semibold text-slate-950">
-              {questionDetails.map((line) => (
-                <p key={line}>{line}</p>
+              {questionDetails.map((line, lineIndex) => (
+                <p key={lineIndex + "-" + line} lang="cs">{line}</p>
               ))}
             </div>
           ) : null}
@@ -67,6 +77,8 @@ export default function ExerciseBlock({ exercise, index, onAnswer }: ExerciseBlo
 
           {isAnswered ? (
             <div
+              role="status"
+              aria-live="polite"
               className={[
                 "mt-4 flex items-start gap-2 rounded-md p-3 text-sm font-medium",
                 isCorrect ? "bg-emerald-50 text-emerald-700" : "bg-rose-50 text-rose-700",

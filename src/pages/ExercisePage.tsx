@@ -11,6 +11,7 @@ export default function ExercisePage() {
   const { verbId } = useParams();
   const verb = verbs.find((item) => item.id === Number(verbId));
   const [answeredIndexes, setAnsweredIndexes] = useState<number[]>([]);
+  const [correctCount, setCorrectCount] = useState(0);
   const { isLearningLocked, registerAnswer, markVerbLearned } = useProgress(verbs.length);
 
   const answeredSet = useMemo(() => new Set(answeredIndexes), [answeredIndexes]);
@@ -53,9 +54,12 @@ export default function ExercisePage() {
 
     registerAnswer(verb.id, isCorrect);
     const nextAnsweredIndexes = [...answeredIndexes, index];
+    const nextCorrectCount = correctCount + (isCorrect ? 1 : 0);
     setAnsweredIndexes(nextAnsweredIndexes);
+    setCorrectCount(nextCorrectCount);
 
-    if (nextAnsweredIndexes.length === verb.exercises.length) {
+    // «Вивчено» лише якщо правильних відповідей щонайменше 80%.
+    if (nextAnsweredIndexes.length === verb.exercises.length && nextCorrectCount / verb.exercises.length >= 0.8) {
       markVerbLearned(verb.id);
     }
   };
@@ -85,10 +89,16 @@ export default function ExercisePage() {
       </div>
 
       {answeredIndexes.length === verb.exercises.length ? (
-        <div className="flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm font-semibold text-emerald-700">
-          <CheckCircle2 size={20} aria-hidden="true" />
-          Дієслово додано до вивчених.
-        </div>
+        correctCount / verb.exercises.length >= 0.8 ? (
+          <div className="flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm font-semibold text-emerald-700">
+            <CheckCircle2 size={20} aria-hidden="true" />
+            Дієслово додано до вивчених ({correctCount} з {verb.exercises.length}).
+          </div>
+        ) : (
+          <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm font-semibold text-amber-800">
+            Правильно {correctCount} з {verb.exercises.length}. Для статусу «вивчено» потрібно щонайменше 80%. Оновіть сторінку й спробуйте ще раз.
+          </div>
+        )
       ) : null}
     </div>
   );

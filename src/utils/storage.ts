@@ -34,7 +34,13 @@ export const emptyProgress: StoredProgress = {
   moduleProgress: {},
 };
 
-const hasStorage = () => typeof window !== "undefined" && Boolean(window.localStorage);
+const hasStorage = () => {
+  try {
+    return typeof window !== "undefined" && Boolean(window.localStorage);
+  } catch {
+    return false;
+  }
+};
 
 export const normalizeNickname = (nickname: string) => nickname.trim().replace(/\s+/g, " ");
 
@@ -91,7 +97,13 @@ const saveProgressStore = (store: ProgressByNickname) => {
     return;
   }
 
-  window.localStorage.setItem(PROGRESS_BY_NICKNAME_KEY, JSON.stringify(store));
+  try {
+    window.localStorage.setItem(PROGRESS_BY_NICKNAME_KEY, JSON.stringify(store));
+  } catch {
+    // Приватний режим або переповнене сховище: не валимо застосунок.
+    return;
+  }
+
   window.dispatchEvent(new Event(PROGRESS_EVENT));
 };
 
@@ -100,7 +112,11 @@ export const loadActiveNickname = () => {
     return "";
   }
 
-  return normalizeNickname(window.localStorage.getItem(ACTIVE_NICKNAME_KEY) ?? "");
+  try {
+    return normalizeNickname(window.localStorage.getItem(ACTIVE_NICKNAME_KEY) ?? "");
+  } catch {
+    return "";
+  }
 };
 
 export const saveActiveNickname = (nickname: string) => {
@@ -110,10 +126,14 @@ export const saveActiveNickname = (nickname: string) => {
 
   const normalizedNickname = normalizeNickname(nickname);
 
-  if (normalizedNickname) {
-    window.localStorage.setItem(ACTIVE_NICKNAME_KEY, normalizedNickname);
-  } else {
-    window.localStorage.removeItem(ACTIVE_NICKNAME_KEY);
+  try {
+    if (normalizedNickname) {
+      window.localStorage.setItem(ACTIVE_NICKNAME_KEY, normalizedNickname);
+    } else {
+      window.localStorage.removeItem(ACTIVE_NICKNAME_KEY);
+    }
+  } catch {
+    return normalizedNickname;
   }
 
   window.dispatchEvent(new Event(PROGRESS_EVENT));

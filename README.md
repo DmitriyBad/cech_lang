@@ -19,6 +19,10 @@ The project is configured for GitHub Pages with:
 In the GitHub repository, open Settings -> Pages and choose GitHub Actions as the source.
 
 
+## Roadmap
+
+Список виправлень і планованих покращень: [IMPROVEMENTS.md](./IMPROVEMENTS.md).
+
 ## Learning Modules
 
 - Czech verbs A1-A2

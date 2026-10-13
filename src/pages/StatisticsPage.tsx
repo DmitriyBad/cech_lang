@@ -21,8 +21,20 @@ export default function StatisticsPage() {
   } = useProgress(verbs.length);
 
   const reviewVerbs = verbs.filter((verb) => reviewVerbIds.includes(verb.id));
+
+  // Загальні лічильники містять відповіді з усіх розділів; для дієслів віднімаємо відповіді модулів та іменників.
+  const otherModules = Object.values(progress.moduleProgress);
+  const verbCorrectAnswers = Math.max(0, progress.correctAnswers - otherModules.reduce((sum, item) => sum + item.correctAnswers, 0));
+  const verbWrongAnswers = Math.max(0, progress.wrongAnswers - otherModules.reduce((sum, item) => sum + item.wrongAnswers, 0));
+
+  const handleReset = () => {
+    if (window.confirm("Скинути весь прогрес для цього нікнейма? Цю дію не можна скасувати.")) {
+      resetProgress();
+    }
+  };
+
   const moduleRows = [
-    { id: "verbs", title: "Дієслова", learnedCount, learnedPercent, correctAnswers: progress.correctAnswers, wrongAnswers: progress.wrongAnswers },
+    { id: "verbs", title: "Дієслова", learnedCount, learnedPercent, correctAnswers: verbCorrectAnswers, wrongAnswers: verbWrongAnswers },
     { id: "nouns", title: "Іменники", ...getModuleStats("nouns", nouns.length) },
     ...grammarModules.map((module) => ({ id: module.id, title: module.title, ...getModuleStats(module.id, module.lessons.length) })),
   ];
@@ -36,7 +48,7 @@ export default function StatisticsPage() {
         </div>
         <button
           type="button"
-          onClick={resetProgress}
+          onClick={handleReset}
           className="focus-ring inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-white px-4 py-2 text-sm font-semibold text-slate-700 ring-1 ring-inset ring-slate-200 hover:bg-slate-100"
         >
           <Trash2 size={18} aria-hidden="true" />

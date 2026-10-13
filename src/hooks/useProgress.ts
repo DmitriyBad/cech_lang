@@ -11,6 +11,25 @@ import {
   subscribeToProgress,
 } from "../utils/storage";
 
+// Правильна відповідь зменшує лічильник помилок, щоб вивчене слово виходило зі списку повторення.
+function decrementMistake<K extends string | number>(mistakes: Record<K, number>, key: K): Record<K, number> {
+  const count = mistakes[key] ?? 0;
+
+  if (count <= 0) {
+    return mistakes;
+  }
+
+  const next = { ...mistakes };
+
+  if (count === 1) {
+    delete next[key];
+  } else {
+    next[key] = count - 1;
+  }
+
+  return next;
+}
+
 export function useProgress(totalVerbs = 0) {
   const [activeNickname, setActiveNickname] = useState(() => loadActiveNickname());
   const [progress, setProgress] = useState<StoredProgress>(() => loadProgress(loadActiveNickname()));
@@ -66,7 +85,7 @@ export function useProgress(totalVerbs = 0) {
         correctAnswers: current.correctAnswers + (isCorrect ? 1 : 0),
         wrongAnswers: current.wrongAnswers + (isCorrect ? 0 : 1),
         mistakesByVerbId: isCorrect
-          ? current.mistakesByVerbId
+          ? decrementMistake(current.mistakesByVerbId, verbId)
           : {
               ...current.mistakesByVerbId,
               [verbId]: (current.mistakesByVerbId[verbId] ?? 0) + 1,
@@ -126,7 +145,7 @@ export function useProgress(totalVerbs = 0) {
               correctAnswers: currentModule.correctAnswers + (isCorrect ? 1 : 0),
               wrongAnswers: currentModule.wrongAnswers + (isCorrect ? 0 : 1),
               mistakesByItemId: isCorrect
-                ? currentModule.mistakesByItemId
+                ? decrementMistake(currentModule.mistakesByItemId, itemId)
                 : {
                     ...currentModule.mistakesByItemId,
                     [itemId]: (currentModule.mistakesByItemId[itemId] ?? 0) + 1,

@@ -12,6 +12,7 @@ export default function ModuleExercisePage() {
   const module = grammarModules.find((item) => item.id === moduleId);
   const lesson = module?.lessons.find((item) => item.id === lessonId);
   const [answeredIndexes, setAnsweredIndexes] = useState<number[]>([]);
+  const [correctCount, setCorrectCount] = useState(0);
   const { isLearningLocked, markModuleItemLearned, registerModuleAnswer } = useProgress();
   const answeredSet = useMemo(() => new Set(answeredIndexes), [answeredIndexes]);
 
@@ -40,9 +41,12 @@ export default function ModuleExercisePage() {
 
     registerModuleAnswer(module.id, lesson.id, isCorrect);
     const nextAnsweredIndexes = [...answeredIndexes, index];
+    const nextCorrectCount = correctCount + (isCorrect ? 1 : 0);
     setAnsweredIndexes(nextAnsweredIndexes);
+    setCorrectCount(nextCorrectCount);
 
-    if (nextAnsweredIndexes.length === lesson.exercises.length) {
+    // «Вивчено» лише якщо правильних відповідей щонайменше 80%.
+    if (nextAnsweredIndexes.length === lesson.exercises.length && nextCorrectCount / lesson.exercises.length >= 0.8) {
       markModuleItemLearned(module.id, lesson.id);
     }
   };
@@ -71,10 +75,16 @@ export default function ModuleExercisePage() {
       </div>
 
       {answeredIndexes.length === lesson.exercises.length ? (
-        <div className="flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm font-semibold text-emerald-700">
-          <CheckCircle2 size={20} aria-hidden="true" />
-          Урок додано до вивчених.
-        </div>
+        correctCount / lesson.exercises.length >= 0.8 ? (
+          <div className="flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm font-semibold text-emerald-700">
+            <CheckCircle2 size={20} aria-hidden="true" />
+            Урок додано до вивчених ({correctCount} з {lesson.exercises.length}).
+          </div>
+        ) : (
+          <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm font-semibold text-amber-800">
+            Правильно {correctCount} з {lesson.exercises.length}. Для статусу «вивчено» потрібно щонайменше 80%. Оновіть сторінку й спробуйте ще раз.
+          </div>
+        )
       ) : null}
     </div>
   );
