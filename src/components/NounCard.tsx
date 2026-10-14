@@ -1,6 +1,7 @@
 import { ArrowRight, LockKeyhole } from "lucide-react";
 import { Link } from "react-router-dom";
 import type { Noun } from "../types/Noun";
+import SpeakButton from "./SpeakButton";
 
 interface NounCardProps {
   noun: Noun;
@@ -20,7 +21,10 @@ export default function NounCard({ noun, isLearned, isLocked }: NounCardProps) {
       <div>
         <div className="flex items-start justify-between gap-3">
           <div>
-            <h3 className="text-xl font-semibold text-slate-950">{noun.noun}</h3>
+            <div className="flex items-center gap-1">
+              <h3 lang="cs" className="text-xl font-semibold text-slate-950">{noun.noun}</h3>
+              <SpeakButton text={noun.noun} />
+            </div>
             <p className="mt-1 text-sm text-slate-600">{noun.translation}</p>
           </div>
           <span className="rounded-md bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700">{noun.level}</span>

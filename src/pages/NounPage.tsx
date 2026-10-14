@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import ExamplesList from "../components/ExamplesList";
 import NicknameNotice from "../components/NicknameNotice";
 import NounDeclensionTable from "../components/NounDeclensionTable";
+import SpeakButton from "../components/SpeakButton";
 import { nouns } from "../data/nouns";
 import { useProgress } from "../hooks/useProgress";
 
@@ -49,7 +50,7 @@ export default function NounPage() {
         <div>
           <span className="rounded-md bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700">{noun.level}</span>
           <h1 className="mt-3 text-3xl font-bold text-slate-950 sm:text-4xl">
-            {noun.noun} — {noun.translation}
+            <span lang="cs">{noun.noun}</span> <SpeakButton text={noun.noun} /> — {noun.translation}
           </h1>
         </div>
         <div className="flex flex-col gap-2 sm:flex-row lg:justify-end">

@@ -1,5 +1,6 @@
 import { caseInfo } from "../data/nouns";
 import type { Noun } from "../types/Noun";
+import SpeakButton from "./SpeakButton";
 
 interface NounDeclensionTableProps {
   noun: Noun;
@@ -28,8 +29,18 @@ export default function NounDeclensionTable({ noun }: NounDeclensionTableProps) 
                   <p className="text-xs text-blue-700">{item.hint}</p>
                 </div>
               </td>
-              <td className="px-4 py-3 text-base font-semibold text-slate-950">{noun.singular[item.key]}</td>
-              <td className="px-4 py-3 text-base font-semibold text-slate-950">{noun.plural[item.key]}</td>
+              <td className="px-4 py-3 text-base font-semibold text-slate-950">
+                <div className="flex items-center justify-between gap-2">
+                  <span lang="cs">{noun.singular[item.key]}</span>
+                  <SpeakButton text={noun.singular[item.key]} />
+                </div>
+              </td>
+              <td className="px-4 py-3 text-base font-semibold text-slate-950">
+                <div className="flex items-center justify-between gap-2">
+                  <span lang="cs">{noun.plural[item.key]}</span>
+                  <SpeakButton text={noun.plural[item.key]} />
+                </div>
+              </td>
             </tr>
           ))}
         </tbody>

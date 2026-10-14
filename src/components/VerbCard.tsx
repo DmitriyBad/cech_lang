@@ -1,6 +1,7 @@
 import { ArrowRight, LockKeyhole, RotateCcw } from "lucide-react";
 import { Link } from "react-router-dom";
 import type { Verb } from "../types/Verb";
+import SpeakButton from "./SpeakButton";
 
 interface VerbCardProps {
   verb: Verb;
@@ -15,7 +16,10 @@ export default function VerbCard({ verb, isLearned, needsReview, isLocked = fals
       <div className="space-y-3">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <h3 className="text-xl font-semibold text-slate-950">{verb.infinitive}</h3>
+            <div className="flex items-center gap-1">
+              <h3 lang="cs" className="text-xl font-semibold text-slate-950">{verb.infinitive}</h3>
+              <SpeakButton text={verb.infinitive} />
+            </div>
             <p className="mt-1 text-sm text-slate-600">{verb.translation}</p>
           </div>
           <span className="rounded-md bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700">{verb.level}</span>

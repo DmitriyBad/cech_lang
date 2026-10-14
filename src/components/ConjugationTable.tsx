@@ -1,4 +1,5 @@
 import type { Verb } from "../types/Verb";
+import SpeakButton from "./SpeakButton";
 
 interface ConjugationTableProps {
   conjugation: Verb["conjugation"];
@@ -27,7 +28,13 @@ export default function ConjugationTable({ conjugation }: ConjugationTableProps)
           {rows.map(([label, key]) => (
             <tr key={key}>
               <td className="px-4 py-3 text-sm font-medium text-slate-600">{label}</td>
-              <td className="px-4 py-3 text-base font-semibold text-slate-950">{conjugation[key]}</td>
+              <td className="px-4 py-3 text-base font-semibold text-slate-950">
+                <div className="flex items-center justify-between gap-2">
+                  <span lang="cs">{conjugation[key]}</span>
+                  {/* Озвучуємо разом із займенником: «já jedu» навчає краще, ніж одна форма. */}
+                  <SpeakButton text={label.split("/")[0] + " " + conjugation[key]} />
+                </div>
+              </td>
             </tr>
           ))}
         </tbody>
