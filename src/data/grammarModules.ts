@@ -1,37 +1,39 @@
-import type { LessonItem, LessonModule } from "../types/Lesson";
-
-const fallbackOptions = [
-  "je",
-  "jsou",
-  "mám",
-  "jde",
-  "dnes",
-  "ráno",
-  "dobře",
-  "prosím",
-  "korun",
-  "hodin",
-  "studenti",
-  "města",
-];
-
-const createOptions = (correctAnswer: string, alternatives: string[]) => {
-  const options = new Set<string>();
-
-  [correctAnswer, ...alternatives, ...fallbackOptions].forEach((item) => {
-    if (item && item !== correctAnswer && options.size < 3) {
-      options.add(item);
-    }
-  });
-
-  return [correctAnswer, ...Array.from(options)].slice(0, 3);
-};
+import type { LessonItem, LessonModule, LessonSentence } from "../types/Lesson";
+import { lessonSentences } from "./lessonSentences";
 
 const czechUi = {
-  practiceExample: "Praktický příklad",
-  forTopic: "k tématu",
   chooseWord: "Vyberte správné slovo do české věty.",
 };
+
+// Тримаємо порядок «правильна відповідь першою»: ExerciseBlock сам перемішує варіанти.
+const buildClozeExercises = (title: string, sentences: LessonSentence[]) =>
+  sentences.map((sentence) => ({
+    question:
+      "UA: Оберіть правильну форму для теми “" +
+      title +
+      "”. Переклад: " +
+      sentence.ua +
+      "\nCZ: " +
+      czechUi.chooseWord +
+      "\n" +
+      sentence.cz.replace(sentence.focus, "___"),
+    options: [sentence.focus, ...sentence.wrong],
+    correctAnswer: sentence.focus,
+  }));
+
+// Обираємо переклад речення; відволікачі — переклади інших речень цього ж уроку.
+const buildTranslationExercises = (sentences: LessonSentence[]) =>
+  sentences.map((sentence, index) => {
+    const distractors = [1, 2]
+      .map((offset) => sentences[(index + offset * 3) % sentences.length].ua)
+      .filter((ua, position, all) => ua !== sentence.ua && all.indexOf(ua) === position);
+
+    return {
+      question: "Що означає: “" + sentence.cz + "”",
+      options: [sentence.ua, ...distractors].slice(0, 3),
+      correctAnswer: sentence.ua,
+    };
+  });
 
 const numberUnits = [
   "nula",
@@ -134,158 +136,8 @@ const specialStudyItemsByLessonId: Record<string, string[]> = {
   ],
 };
 
-const exampleSceneTemplates = [
-  {
-    cz: (sentence: string) => sentence,
-    ua: (sentence: string, title: string, index: number) => "Приклад " + index + " для теми “" + title + "”: " + sentence,
-  },
-  {
-    cz: (sentence: string) => "Na tabuli je věta: “" + sentence + "”.",
-    ua: (sentence: string) => "На дошці речення: “" + sentence + "”.",
-  },
-  {
-    cz: (sentence: string) => "V krátkém dialogu použiju: “" + sentence + "”.",
-    ua: (sentence: string) => "У короткому діалозі я використовую: “" + sentence + "”.",
-  },
-  {
-    cz: (sentence: string) => "Učitel říká pomalu: “" + sentence + "”.",
-    ua: (sentence: string) => "Учитель повільно каже: “" + sentence + "”.",
-  },
-  {
-    cz: (sentence: string) => "V sešitě mám poznámku: “" + sentence + "”.",
-    ua: (sentence: string) => "У зошиті маю нотатку: “" + sentence + "”.",
-  },
-  {
-    cz: (sentence: string) => "Kamarád se ptá a já odpovím: “" + sentence + "”.",
-    ua: (sentence: string) => "Друг питає, і я відповідаю: “" + sentence + "”.",
-  },
-  {
-    cz: (sentence: string) => "V aplikaci si ukládám kartu: “" + sentence + "”.",
-    ua: (sentence: string) => "У застосунку я зберігаю картку: “" + sentence + "”.",
-  },
-  {
-    cz: (sentence: string) => "Před testem si opakuju: “" + sentence + "”.",
-    ua: (sentence: string) => "Перед тестом я повторюю: “" + sentence + "”.",
-  },
-  {
-    cz: (sentence: string) => "V malé scénce zazní: “" + sentence + "”.",
-    ua: (sentence: string) => "У маленькій сценці лунає: “" + sentence + "”.",
-  },
-  {
-    cz: (sentence: string) => "Do zprávy píšu: “" + sentence + "”.",
-    ua: (sentence: string) => "У повідомленні я пишу: “" + sentence + "”.",
-  },
-  {
-    cz: (sentence: string) => "Na kartičce vidím českou větu: “" + sentence + "”.",
-    ua: (sentence: string) => "На картці я бачу чеське речення: “" + sentence + "”.",
-  },
-  {
-    cz: (sentence: string) => "Při domácím úkolu doplním: “" + sentence + "”.",
-    ua: (sentence: string) => "У домашньому завданні я доповнюю: “" + sentence + "”.",
-  },
-  {
-    cz: (sentence: string) => "Ve třídě porovnáváme větu: “" + sentence + "”.",
-    ua: (sentence: string) => "У класі ми порівнюємо речення: “" + sentence + "”.",
-  },
-  {
-    cz: (sentence: string) => "V běžné řeči často uslyším: “" + sentence + "”.",
-    ua: (sentence: string) => "У звичайній мові я часто чую: “" + sentence + "”.",
-  },
-  {
-    cz: (sentence: string) => "Když mluvím česky, hodí se věta: “" + sentence + "”.",
-    ua: (sentence: string) => "Коли я говорю чеською, корисне речення: “" + sentence + "”.",
-  },
-  {
-    cz: (sentence: string) => "V překladu kontroluju český tvar: “" + sentence + "”.",
-    ua: (sentence: string) => "У перекладі я перевіряю чеську форму: “" + sentence + "”.",
-  },
-  {
-    cz: (sentence: string) => "Na konci lekce čtu nahlas: “" + sentence + "”.",
-    ua: (sentence: string) => "Наприкінці уроку я читаю вголос: “" + sentence + "”.",
-  },
-  {
-    cz: (sentence: string) => "V rychlém cvičení vybírám větu: “" + sentence + "”.",
-    ua: (sentence: string) => "У швидкій вправі я вибираю речення: “" + sentence + "”.",
-  },
-  {
-    cz: (sentence: string) => "Pro vlastní příklad si zapíšu: “" + sentence + "”.",
-    ua: (sentence: string) => "Для власного прикладу я записую: “" + sentence + "”.",
-  },
-  {
-    cz: (sentence: string) => "Tuto větu chci umět říct bez dlouhého přemýšlení: “" + sentence + "”.",
-    ua: (sentence: string) => "Це речення я хочу вміти сказати без довгих роздумів: “" + sentence + "”.",
-  },
-];
-
-const buildTwentyExamples = (title: string, examples: string[]) =>
-  Array.from({ length: 20 }, (_, index) => {
-    const baseExample = examples[index % examples.length];
-    const template = exampleSceneTemplates[index % exampleSceneTemplates.length];
-
-    return {
-      cz: template.cz(baseExample),
-      ua: template.ua(baseExample, title, index + 1),
-    };
-  });
-
-const normalizeWord = (word: string) => word.replace(/^[“"„(]+|[”".,!?;:)]+$/g, "").trim();
-
-const extractWords = (text: string) =>
-  text
-    .replace(/->/g, " ")
-    .split(/\s+/)
-    .map(normalizeWord)
-    .filter((word) => word.length > 1 && !/^\d+$/.test(word));
-
-const pickAnswer = (example: string, index: number) => {
-  const targetPart = example.includes("->") ? example.split("->").pop() ?? example : example;
-  const words = extractWords(targetPart);
-  const fallbackWords = extractWords(example);
-  const candidates = words.length > 0 ? words : fallbackWords;
-
-  if (candidates.length === 0) {
-    return example;
-  }
-
-  const offset = index % Math.min(candidates.length, 2);
-  return candidates[candidates.length - 1 - offset];
-};
-
-const buildClozeSentence = (example: string, answer: string) => {
-  const position = example.lastIndexOf(answer);
-
-  if (position === -1) {
-    return example + " ___";
-  }
-
-  return example.slice(0, position) + "___" + example.slice(position + answer.length);
-};
-
 const buildStudyItems = (id: string, subtitle: string, explanation: string, examples: string[]) =>
   specialStudyItemsByLessonId[id] ?? Array.from(new Set([subtitle, explanation, ...examples])).slice(0, 8);
-
-const buildTwentyExercises = (title: string, _level: "A1" | "A2", examples: string[]) =>
-  Array.from({ length: 20 }, (_, index) => {
-    const baseExample = examples[index % examples.length];
-    const correctAnswer = pickAnswer(baseExample, index);
-    const clozeSentence = buildClozeSentence(baseExample, correctAnswer);
-    const alternatives = examples
-      .filter((example) => example !== baseExample)
-      .flatMap(extractWords)
-      .filter((word) => word !== correctAnswer);
-
-    return {
-      question:
-        "UA: Оберіть правильне слово для чеського речення в темі “" +
-        title +
-        "”. CZ: " +
-        czechUi.chooseWord +
-        "\n" +
-        clozeSentence,
-      options: createOptions(correctAnswer, alternatives),
-      correctAnswer,
-    };
-  });
 
 const buildLesson = (
   id: string,
@@ -293,17 +145,25 @@ const buildLesson = (
   subtitle: string,
   level: "A1" | "A2",
   explanation: string,
-  examples: string[],
-): LessonItem => ({
-  id,
-  title,
-  subtitle,
-  level,
-  explanation: explanation + " / Česky: " + czechUi.practiceExample + " " + czechUi.forTopic + " “" + title + "”.",
-  studyItems: buildStudyItems(id, subtitle, explanation, examples),
-  examples: buildTwentyExamples(title, examples),
-  exercises: buildTwentyExercises(title, level, examples),
-});
+  seedExamples: string[],
+): LessonItem => {
+  const sentences = lessonSentences[id];
+
+  if (!sentences || sentences.length === 0) {
+    throw new Error("Немає речень для уроку: " + id);
+  }
+
+  return {
+    id,
+    title,
+    subtitle,
+    level,
+    explanation,
+    studyItems: buildStudyItems(id, subtitle, explanation, seedExamples),
+    examples: sentences.map(({ cz, ua }) => ({ cz, ua })),
+    exercises: [...buildClozeExercises(title, sentences), ...buildTranslationExercises(sentences)],
+  };
+};
 
 const rawModules = [
   {

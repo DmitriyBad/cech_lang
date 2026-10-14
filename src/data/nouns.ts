@@ -1,5 +1,15 @@
-import type { Exercise } from "../types/Verb";
+import type { Example, Exercise } from "../types/Verb";
 import type { CzechCaseKey, Noun, NounCaseForms } from "../types/Noun";
+import { nounExamplesA } from "./nounExamplesA";
+import { nounExamplesB } from "./nounExamplesB";
+import { nounExamplesC } from "./nounExamplesC";
+
+// Вручну написані речення (6 на слово, різні відмінки й конструкції).
+const handwrittenNounExamples: Record<number, Example[]> = {
+  ...nounExamplesA,
+  ...nounExamplesB,
+  ...nounExamplesC,
+};
 
 type NounSeed = {
   noun: string;
@@ -1287,7 +1297,14 @@ const buildExamples = (noun: Pick<Noun, "noun" | "translation" | "singular" | "p
   { cz: "V dialogu používám tvar “" + noun.singular.locative + "”.", ua: "У діалозі я використовую місцевий відмінок." },
 ];
 
-const buildExercises = (noun: Pick<Noun, "noun" | "translation" | "singular" | "plural">): Exercise[] => [
+// Незмінні іменники (nádraží, cvičení, zboží…) мають однакові форми в багатьох відмінках, тому деякі
+// вправи лишаються з одним варіантом відповіді. Такі вправи не мають сенсу, їх відкидаємо.
+const buildExercises = (noun: Pick<Noun, "noun" | "translation" | "singular" | "plural">): Exercise[] =>
+  buildAllExercises(noun).filter(
+    (exercise) => new Set(exercise.options).size >= 2 && exercise.options.includes(exercise.correctAnswer),
+  );
+
+const buildAllExercises = (noun: Pick<Noun, "noun" | "translation" | "singular" | "plural">): Exercise[] => [
   {
     question: "Оберіть genitiv однини для “" + noun.noun + "”",
     options: withOptions(noun.singular.genitive, [noun.singular.dative, noun.singular.accusative]),
@@ -1413,9 +1430,10 @@ const formOverrides: Record<string, FormOverrides> = {
   číslo: { plural: { genitive: "čísel" } },
   letadlo: { plural: { genitive: "letadel" } },
   divadlo: { plural: { genitive: "divadel" } },
-  parkoviště: { plural: { genitive: "parkovišť" } },
-  letiště: { plural: { genitive: "letišť" } },
-  hřiště: { plural: { genitive: "hřišť" } },
+  parkoviště: { singular: { genitive: "parkoviště", instrumental: "parkovištěm" }, plural: { genitive: "parkovišť" } },
+  letiště: { singular: { genitive: "letiště", instrumental: "letištěm" }, plural: { genitive: "letišť" } },
+  hřiště: { singular: { genitive: "hřiště", instrumental: "hřištěm" }, plural: { genitive: "hřišť" } },
+  centrum: { singular: { genitive: "centra" }, plural: { genitive: "center" } },
   moře: { plural: { genitive: "moří" } },
 };
 
@@ -1440,7 +1458,8 @@ export const nouns: Noun[] = nounSeeds.map((seed, index) => {
 
   return {
     ...baseNoun,
-    examples: buildExamples(baseNoun),
+    // Шаблонні речення лишаються лише запасним варіантом, якщо для слова немає власних прикладів.
+    examples: handwrittenNounExamples[baseNoun.id] ?? buildExamples(baseNoun),
     exercises: buildExercises(baseNoun),
   };
 });

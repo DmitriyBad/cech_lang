@@ -1,5 +1,12 @@
 import type { Example, Exercise } from "./Verb";
 
+// Справжнє речення уроку: `focus` — слово/форма з уроку (точний підрядок `cz`), яке перевіряє вправа;
+// `wrong` — два правдоподібні, але хибні варіанти цього слова (інша форма, відмінок, закінчення).
+export interface LessonSentence extends Example {
+  focus: string;
+  wrong: [string, string];
+}
+
 export interface LessonItem {
   id: string;
   title: string;
