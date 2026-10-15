@@ -98,7 +98,7 @@ const nounSeeds: NounSeed[] = [
     "translation": "колега",
     "gender": "masculine",
     "paradigm": "animateA",
-    "stem": "kolega",
+    "stem": "koleg",
     "locativeSingular": "kolegovi",
     "nominativePlural": "kolegové",
     "level": "A2"
@@ -108,7 +108,7 @@ const nounSeeds: NounSeed[] = [
     "translation": "турист",
     "gender": "masculine",
     "paradigm": "animateA",
-    "stem": "turista",
+    "stem": "turist",
     "locativeSingular": "turistovi",
     "nominativePlural": "turisté",
     "level": "A1"
@@ -257,7 +257,7 @@ const nounSeeds: NounSeed[] = [
     "noun": "pokoj",
     "translation": "кімната",
     "gender": "masculine",
-    "paradigm": "inanimateHard",
+    "paradigm": "inanimateSoft",
     "stem": "pokoj",
     "locativeSingular": "pokoji",
     "nominativePlural": "pokoje",
@@ -397,7 +397,7 @@ const nounSeeds: NounSeed[] = [
     "noun": "měsíc",
     "translation": "місяць",
     "gender": "masculine",
-    "paradigm": "inanimateHard",
+    "paradigm": "inanimateSoft",
     "stem": "měsíc",
     "locativeSingular": "měsíci",
     "nominativePlural": "měsíce",
@@ -1040,6 +1040,16 @@ const withOptions = (correctAnswer: string, options: string[]) =>
 
 const hardPluralGenitive = (seed: NounSeed) => seed.stem + "ů";
 
+// Місцевий відмінок множини твердих чоловічих основ: після k, h, ch відбувається чергування
+// (k→c, h/g→z, ch→š) і закінчення -ích (vlak → vlacích, batoh → batozích, kolega → kolezích),
+// в інших випадках -ech.
+const hardLocativePlural = (stem: string) => {
+  if (stem.endsWith("ch")) return stem.slice(0, -2) + "ších";
+  if (stem.endsWith("k")) return stem.slice(0, -1) + "cích";
+  if (stem.endsWith("h") || stem.endsWith("g")) return stem.slice(0, -1) + "zích";
+  return stem + "ech";
+};
+
 const decline = (seed: NounSeed): { singular: NounCaseForms; plural: NounCaseForms; animate?: boolean } => {
   switch (seed.paradigm) {
     case "animateHard":
@@ -1060,7 +1070,7 @@ const decline = (seed: NounSeed): { singular: NounCaseForms; plural: NounCaseFor
           dative: seed.stem + "ům",
           accusative: seed.stem + "y",
           vocative: seed.nominativePlural,
-          locative: seed.stem + "ech",
+          locative: hardLocativePlural(seed.stem),
           instrumental: seed.stem + "y",
         },
       };
@@ -1104,7 +1114,7 @@ const decline = (seed: NounSeed): { singular: NounCaseForms; plural: NounCaseFor
           dative: seed.stem + "ům",
           accusative: seed.stem + "y",
           vocative: seed.nominativePlural,
-          locative: seed.stem + "ech",
+          locative: hardLocativePlural(seed.stem),
           instrumental: seed.stem + "y",
         },
       };
@@ -1272,7 +1282,7 @@ const decline = (seed: NounSeed): { singular: NounCaseForms; plural: NounCaseFor
           dative: seed.stem + "ům",
           accusative: seed.nominativePlural,
           vocative: seed.nominativePlural,
-          locative: seed.stem + "ech",
+          locative: hardLocativePlural(seed.stem),
           instrumental: seed.stem + "y",
         },
       };
@@ -1299,9 +1309,16 @@ const buildExamples = (noun: Pick<Noun, "noun" | "translation" | "singular" | "p
 
 // Незмінні іменники (nádraží, cvičení, zboží…) мають однакові форми в багатьох відмінках, тому деякі
 // вправи лишаються з одним варіантом відповіді. Такі вправи не мають сенсу, їх відкидаємо.
-const buildExercises = (noun: Pick<Noun, "noun" | "translation" | "singular" | "plural">): Exercise[] =>
+// Слова, які майже не вживаються в множині: вправи на форми множини для них не мають сенсу.
+const pluralRareNouns = new Set(["ovoce", "nádobí", "zboží", "učení", "bydlení", "oblečení"]);
+const pluralExercisePattern = /множини|однина-множина|Tady jsou|Pracuju s/;
+
+const buildExercises = (noun: Pick<Noun, "noun" | "translation" | "singular" | "plural">, pluralRare = false): Exercise[] =>
   buildAllExercises(noun).filter(
-    (exercise) => new Set(exercise.options).size >= 2 && exercise.options.includes(exercise.correctAnswer),
+    (exercise) =>
+      new Set(exercise.options).size >= 2 &&
+      exercise.options.includes(exercise.correctAnswer) &&
+      !(pluralRare && pluralExercisePattern.test(exercise.question)),
   );
 
 const buildAllExercises = (noun: Pick<Noun, "noun" | "translation" | "singular" | "plural">): Exercise[] => [
@@ -1399,7 +1416,7 @@ const formOverrides: Record<string, FormOverrides> = {
   // -ek / -ec: випадний голосний
   účet: {
     singular: { genitive: "účtu", dative: "účtu", instrumental: "účtem" },
-    plural: { genitive: "účtů", dative: "účtům", locative: "účtech" },
+    plural: { genitive: "účtů", dative: "účtům", locative: "účtech", instrumental: "účty" },
   },
   // локатив множини на -ích після k/h
   park: { plural: { locative: "parcích" } },
@@ -1418,10 +1435,16 @@ const formOverrides: Record<string, FormOverrides> = {
   koupelna: { plural: { genitive: "koupelen" } },
   karta: { plural: { genitive: "karet" } },
   // жіночий рід на -e / -ě / -ie
-  práce: { plural: { genitive: "prací" } },
+  // у práce довгий «á» скорочується в усіх формах, крім називного/родового/знахідного/кличного
+  práce: {
+    singular: { instrumental: "prací" },
+    plural: { genitive: "prací", dative: "pracím", locative: "pracích", instrumental: "pracemi" },
+  },
+  rok: { singular: { locative: "roce" } },
+  čas: { singular: { locative: "čase" } },
   restaurace: { plural: { genitive: "restaurací" } },
   lekce: { plural: { genitive: "lekcí" } },
-  kuchyně: { plural: { genitive: "kuchyní" } },
+  kuchyně: { plural: { genitive: "kuchyní", instrumental: "kuchyněmi" } },
   fotografie: { plural: { genitive: "fotografií" } },
   informace: { plural: { genitive: "informací" } },
   // середній рід
@@ -1456,10 +1479,13 @@ export const nouns: Noun[] = nounSeeds.map((seed, index) => {
     plural: forms.plural,
   };
 
+  const pluralRare = pluralRareNouns.has(seed.noun);
+
   return {
     ...baseNoun,
+    pluralRare,
     // Шаблонні речення лишаються лише запасним варіантом, якщо для слова немає власних прикладів.
     examples: handwrittenNounExamples[baseNoun.id] ?? buildExamples(baseNoun),
-    exercises: buildExercises(baseNoun),
+    exercises: buildExercises(baseNoun, pluralRare),
   };
 });

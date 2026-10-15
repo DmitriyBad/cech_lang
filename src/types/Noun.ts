@@ -19,6 +19,8 @@ export interface Noun {
   level: "A1" | "A2";
   gender: "masculine" | "feminine" | "neuter";
   animate?: boolean;
+  /** Слово майже не вживається в множині (ovoce, nádobí, zboží…). */
+  pluralRare?: boolean;
   singular: NounCaseForms;
   plural: NounCaseForms;
   examples: Example[];

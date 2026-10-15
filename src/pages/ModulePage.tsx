@@ -41,7 +41,12 @@ export default function ModulePage() {
         <div>
           <span className="rounded-md bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700">{lesson.level}</span>
           <h1 className="mt-3 text-3xl font-bold text-slate-950 sm:text-4xl">{lesson.title}</h1>
-          <p className="mt-2 text-slate-600">{lesson.explanation}</p>
+          {/* Пояснення може складатися з кількох рядків-правил; кожен виводимо окремим абзацом. */}
+          <div className="mt-2 max-w-3xl space-y-1.5 text-slate-600">
+            {lesson.explanation.split("\n").map((line) => (
+              <p key={line}>{line}</p>
+            ))}
+          </div>
         </div>
         <div className="flex flex-col gap-2 sm:flex-row lg:justify-end">
           <button

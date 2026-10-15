@@ -136,8 +136,9 @@ const specialStudyItemsByLessonId: Record<string, string[]> = {
   ],
 };
 
-const buildStudyItems = (id: string, subtitle: string, explanation: string, examples: string[]) =>
-  specialStudyItemsByLessonId[id] ?? Array.from(new Set([subtitle, explanation, ...examples])).slice(0, 8);
+// Підзаголовок і пояснення вже показані на сторінці уроку, тому в «Короткий перелік» потрапляють лише приклади.
+const buildStudyItems = (id: string, examples: string[]) =>
+  specialStudyItemsByLessonId[id] ?? Array.from(new Set(examples)).slice(0, 8);
 
 const buildLesson = (
   id: string,
@@ -159,7 +160,7 @@ const buildLesson = (
     subtitle,
     level,
     explanation,
-    studyItems: buildStudyItems(id, subtitle, explanation, seedExamples),
+    studyItems: buildStudyItems(id, seedExamples),
     examples: sentences.map(({ cz, ua }) => ({ cz, ua })),
     exercises: [...buildClozeExercises(title, sentences), ...buildTranslationExercises(sentences)],
   };
@@ -177,7 +178,7 @@ const rawModules = [
         "Чоловічий рід: люди",
         "student -> studenti",
         "A1",
-        "У чоловічому роді для людей часто з'являються форми -i або -é.",
+        "Для істот (людей, тварин) після твердого приголосного множина має -i: student → studenti, kamarád → kamarádi.\nПеред -i приголосний змінюється: k → c (kluk → kluci), h → z (vrah → vrazi), ch → š (Čech → Češi), r → ř (bratr → bratři).\nСлова на -tel, -an, -ista мають -é: učitel → učitelé, občan → občané, turista → turisté.\nСлова на -ec втрачають «e»: cizinec → cizinci. Деякі слова мають -ové: pán → pánové, syn → synové.",
         [
           "jeden student -> dva studenti",
           "jeden učitel -> dva učitelé",
@@ -189,7 +190,7 @@ const rawModules = [
         "Чоловічий рід: речі",
         "obchod -> obchody",
         "A1",
-        "Для неживих іменників часто бачимо закінчення -y або -e.",
+        "Після твердого приголосного множина має -y: obchod → obchody, vlak → vlaky, lístek → lístky (при цьому «e» випадає).\nПісля м'якого приголосного (č, š, ž, ř, c, j) множина має -e: klíč → klíče, pokoj → pokoje, měsíc → měsíce.\nНеправильні форми треба запам'ятати: dům → domy, den → dny.",
         [
           "jeden obchod -> dva obchody",
           "jeden klíč -> dva klíče",
@@ -201,7 +202,7 @@ const rawModules = [
         "Жіночий рід на -a",
         "škola -> školy",
         "A1",
-        "Багато жіночих іменників на -a у множині мають -y.",
+        "Жіночий рід на -a: у множині -a змінюється на -y: škola → školy, mapa → mapy, taška → tašky.\nУ родовому відмінку множини -a зникає, а між приголосними з'являється «e»: škol, ale tašek.",
         [
           "jedna škola -> dvě školy",
           "jedna taška -> dvě tašky",
@@ -213,7 +214,7 @@ const rawModules = [
         "Жіночий рід на -e",
         "ulice -> ulice",
         "A1",
-        "Частина жіночих іменників має однакову форму в називному однини та множини.",
+        "Жіночий рід на -e (ulice, restaurace, informace) у називному множини не змінюється: jedna ulice → dvě ulice. Число видно з контексту.\nЖіночі іменники на приголосний (věc, místnost, noc) мають у множині -i: věc → věci, místnost → místnosti, noc → noci.",
         [
           "jedna ulice -> dvě ulice",
           "jedna restaurace -> dvě restaurace",
@@ -225,7 +226,7 @@ const rawModules = [
         "Середній рід на -o",
         "město -> města",
         "A1",
-        "Середній рід на -o часто переходить у -a.",
+        "Середній рід на -o у множині має -a: město → města, slovo → slova, auto → auta.\nСлова на -um втрачають його: centrum → centra, muzeum → muzea.\nСлова на -e/-ě не змінюються: moře → moře, letiště → letiště.",
         [
           "jedno město -> dvě města",
           "jedno slovo -> dvě slova",
@@ -237,7 +238,7 @@ const rawModules = [
         "Середній рід на -í",
         "nádraží -> nádraží",
         "A2",
-        "Іменники на -í часто мають однаковий вигляд у множині.",
+        "Середній рід на -í у називному множини не змінюється: nádraží → nádraží, cvičení → cvičení.\nЧисло видно з контексту: jedno nádraží, dvě nádraží.",
         [
           "jedno nádraží -> dvě nádraží",
           "jedno cvičení -> dvě cvičení",
@@ -306,7 +307,7 @@ const rawModules = [
         "Ціни",
         "Kolik to stojí?",
         "A1",
-        "Після 5+ часто вживаємо genitiv plural: pět korun.",
+        "Після числівника іменник змінює форму за правилом:\n1 → називний однини: jedna koruna;\n2, 3, 4 → називний множини: dvě koruny, tři koruny, čtyři koruny;\n5 і більше → родовий множини: pět korun, sto korun. Так само після kolik: Kolik korun?\nРід: jeden stůl, jedna koruna, jedno auto; dva stoly, але dvě koruny і dvě auta.",
         [
           "jedna koruna",
           "dvě koruny",
@@ -318,7 +319,7 @@ const rawModules = [
         "Вік",
         "Je mi dvacet let",
         "A1",
-        "Вік у чеській кажуть через конструкцію Je mi...",
+        "Вік кажуть через конструкцію Je mi + число + рік: «мені …» (буквально).\n1 → Je mi jeden rok. 2, 3, 4 → Jsou mi dva roky. 5 і більше → Je mi pět let (родовий множини).\nПитання: Kolik je ti let? (до друга), Kolik je vám let? (ввічливо).",
         [
           "Je mi jeden rok.",
           "Jsou mi dva roky.",
@@ -330,10 +331,10 @@ const rawModules = [
         "Телефонні номери",
         "по цифрах",
         "A1",
-        "Номери зазвичай читають групами цифр.",
+        "Номер телефону зазвичай називають групами по три цифри, кожну цифру окремо: 777 123 456 → sedm sedm sedm, jedna dva tři, čtyři pět šest.\nНуль читається nula. Питання: Jaké je vaše telefonní číslo?",
         [
           "Moje číslo je 777 123 456.",
-          "Napište prosím telefon.",
+          "Napište mi prosím své telefonní číslo.",
           "Zavolám na nové číslo."
         ]
       ]
@@ -350,7 +351,7 @@ const rawModules = [
         "Дні тижня",
         "v pondělí, v úterý",
         "A1",
-        "Для днів тижня часто вживаємо v + accusativ/lokál у сталих формах.",
+        "Відповідь на питання Kdy? («коли?»): v/ve + знахідний відмінок: v pondělí, v úterý, ve středu, ve čtvrtek, v pátek, v sobotu, v neděli.\nПеред скупченням приголосних замість v стоїть ve: ve středu, ve čtvrtek.\nВихідні кажуть інакше: o víkendu (o + місцевий відмінок).",
         [
           "v pondělí",
           "ve středu",
@@ -386,7 +387,7 @@ const rawModules = [
         "Пів і чверть",
         "půl třetí, čtvrt na pět",
         "A2",
-        "Чеський час часто рахує до наступної години.",
+        "Чеською півгодини й чверті рахують до НАСТУПНОЇ години:\npůl třetí = 2:30 (половина на шляху до третьої). Форма жіночого роду в родовому відмінку: půl jedné (12:30), půl druhé (1:30), půl třetí (2:30), půl deváté (8:30).\nčtvrt na pět = 4:15; tři čtvrtě na osm = 7:45.\nKolik je hodin? → Je půl třetí. Kdy? → V půl třetí, ve čtvrt na pět; цілі години: v jednu, ve dvě, ve tři.",
         [
           "Je půl třetí.",
           "Je čtvrt na pět.",
@@ -410,7 +411,7 @@ const rawModules = [
         "Дати",
         "25. června",
         "A2",
-        "Дати читаємо з порядковими числівниками.",
+        "Дату пишуть як порядкове число з крапкою і місяць у родовому відмінку: 25. června, 3. března, 12. května.\nВимовляють порядковим числівником у родовому відмінку: dvacátého pátého června.\nМісяці в родовому: ledna, února, března, dubna, května, června, července, srpna, září, října, listopadu, prosince.",
         [
           "Dnes je 25. června.",
           "Narodil jsem se 3. března.",
@@ -490,7 +491,7 @@ const rawModules = [
         "Порівняння",
         "lepší, větší, menší",
         "A2",
-        "На A2 корисно знати базові порівняння.",
+        "Вищий ступінь: до основи додають -ější/-ejší або -ší: nový → novější, rychlý → rychlejší, levný → levnější.\nНеправильні, їх треба запам'ятати: dobrý → lepší, malý → menší, velký → větší, špatný → horší, dlouhý → delší.\nПорівняння з «ніж»: Pokoj je větší než kuchyně. Найвищий ступінь: nej- + вищий: nejlepší, největší.",
         [
           "To je lepší plán.",
           "Pokoj je větší.",
@@ -510,7 +511,7 @@ const rawModules = [
         "Genitiv",
         "do školy, bez vody",
         "A1",
-        "Після do, bez, od часто потрібен genitiv.",
+        "Родовий відмінок (koho? čeho?) завжди стоїть після прийменників do, z/ze, od, bez, u, vedle, kolem, podle, blízko.\ndo školy («до школи», усередину), bez vody, od kamaráda, u doktora, vedle banky.",
         [
           "Jdu do školy.",
           "Jsem bez vody.",
@@ -522,19 +523,19 @@ const rawModules = [
         "Dativ",
         "k lékaři, k domu",
         "A1",
-        "Після k/ke часто потрібен dativ.",
+        "Давальний відмінок (komu? čemu?) стоїть після прийменників k/ke («до, у напрямку до»), díky («завдяки»), kvůli («через»), naproti («навпроти») і після дієслів, які керують давальним: pomáhat, telefonovat.\nk lékaři = до лікаря (до людини); ke škole = у напрямку до школи, але не всередину. Усередину кажуть do školy.\nБез прийменника: Pomáhám sousedovi. Telefonuju sousedovi.",
         [
           "Jdu k lékaři.",
           "Jdeme ke škole.",
-          "Telefonuju k sousedovi."
+          "Telefonuju sousedovi."
         ]
       ],
       [
         "prep-accusative",
         "Akuzativ",
-        "na poštu, do práce",
+        "na poštu, pro kamaráda",
         "A1",
-        "Напрям руху часто вимагає akuzativ.",
+        "Знахідний відмінок (koho? co?) стоїть після na, pro, přes, za (напрям) і як прямий додаток: Vidím sestru. Mám kávu.\nНапрям на установу чи подію: na + знахідний (Jdu na poštu). Напрям у приміщення кажуть інакше: do + родовий (do práce, do školy).\nЯкщо слово назва істоти чоловічого роду, знахідний збігається з родовим: Vidím studenta.",
         [
           "Jdu na poštu.",
           "Dívám se na film.",
@@ -546,10 +547,10 @@ const rawModules = [
         "Lokál",
         "v Praze, na nádraží",
         "A1",
-        "Місце часто має v/na + lokál.",
+        "Місцевий відмінок (o kom? o čem?) вживається лише з прийменниками: v/ve (всередині: v Praze, v knihovně), na (на установі, події, поверхні: na poště, na nádraží), o (про: mluvím o práci), po, při.\nПрийменник v чи na треба запам'ятати разом зі словом.\nУ формах змінюється приголосний: h → z (Praha → v Praze), k → c (taška → v tašce), r → ř (sestra → o sestře). Після d, t, n пишеться -ě: v kavárně, v Brně.",
         [
           "Bydlím v Praze.",
-          "Čekám na nádraží.",
+          "Stojím na nádraží.",
           "Mluvím o práci."
         ]
       ],
@@ -558,7 +559,7 @@ const rawModules = [
         "Instrumentál",
         "s kamarádem",
         "A1",
-        "Після s/со вживаємо instrumentál.",
+        "Орудний відмінок (kým? čím?) стоїть після s/se («з»): s kamarádem, se sestrou (se — перед скупченням приголосних).\nБез прийменника він означає засіб чи знаряддя: píšu perem, platím kartou, jedu autem.\nТакож після před, za, nad, pod, mezi, коли йдеться про місце: před školou, za domem, nad městem.",
         [
           "Jdu s kamarádem.",
           "Píšu perem.",
@@ -570,7 +571,7 @@ const rawModules = [
         "Напрям чи місце",
         "na poštu / na poště",
         "A2",
-        "Рух і місце можуть давати різні відмінки.",
+        "На питання Kam? («куди?») відповідають напрямком, на питання Kde? («де?») — місцем:\nKam? Jdu na poštu (знахідний). Jedeme do centra (родовий).\nKde? Jsem na poště (місцевий). Jsme v centru (місцевий).\nПари: na poštu → na poště, do školy → ve škole, do Prahy → v Praze.",
         [
           "Jdu na poštu.",
           "Jsem na poště.",

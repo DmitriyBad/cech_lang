@@ -266,7 +266,7 @@ const verbBase = [
   {
     "id": 7,
     "infinitive": "moci",
-    "translation": "могти",
+    "translation": "могти, мати змогу",
     "level": "A1",
     "conjugation": {
       "ja": "můžu",
@@ -350,7 +350,7 @@ const verbBase = [
   {
     "id": 10,
     "infinitive": "vědět",
-    "translation": "знати",
+    "translation": "знати (факт, інформацію)",
     "level": "A1",
     "conjugation": {
       "ja": "vím",
@@ -742,7 +742,7 @@ const verbBase = [
   {
     "id": 24,
     "infinitive": "studovat",
-    "translation": "навчатися",
+    "translation": "навчатися у виші, вивчати",
     "level": "A1",
     "conjugation": {
       "ja": "studuju",
@@ -854,7 +854,7 @@ const verbBase = [
   {
     "id": 28,
     "infinitive": "říkat",
-    "translation": "казати",
+    "translation": "казати, називати",
     "level": "A1",
     "conjugation": {
       "ja": "říkám",
@@ -910,7 +910,7 @@ const verbBase = [
   {
     "id": 30,
     "infinitive": "znát",
-    "translation": "знати",
+    "translation": "знати (людину, місце, річ)",
     "level": "A1",
     "conjugation": {
       "ja": "znám",
@@ -2902,7 +2902,44 @@ const verbsWithExamples: VerbSeed[] = verbBase.map((verb) => ({
   examples: buildExamples(verb),
 }));
 
+// Доконані дієслова: їхні «теперішні» форми мають значення майбутнього часу.
+const perfectiveInfinitives = new Set([
+  "říct", "dát", "vzít", "přijít", "odejít", "přijet", "odjet", "objednat", "najít", "začít", "skončit",
+  "otevřít", "zavřít", "přinést", "odnést", "vrátit se", "zůstat", "zapomenout", "poslat", "dostat",
+  "odpovědět", "ukázat", "vysvětlit", "připravit", "změnit", "stát se", "potkat", "navštívit", "vybrat",
+  "zapnout", "vypnout", "opravit", "zkusit", "narodit se", "umřít",
+]);
+
+// Літературні варіанти для слів із розмовними формами в таблиці, які не зводяться до правила «-ju → -ji».
+const formalOverrides: Record<string, NonNullable<Verb["formalForms"]>> = {
+  moci: { ja: "mohu", oni: "mohou" },
+  psát: { ja: "píši", oni: "píší" },
+};
+
+const getFormalForms = (verb: VerbSeed): Verb["formalForms"] => {
+  const override = formalOverrides[verb.infinitive];
+
+  if (override) {
+    return override;
+  }
+
+  // pracuju → pracuji, žiju → žiji, směju se → směji se, pamatuju si → pamatuji si
+  const ja = verb.conjugation.ja;
+  return /ju( se| si)?$/.test(ja) ? { ja: ja.replace(/ju( se| si)?$/, "ji$1") } : undefined;
+};
+
+const verbNotes: Record<string, string[]> = {
+  vědět: ["«Vědět» означає знати факт чи інформацію: Vím, že je pozdě. Nevím, kde to je. Про людей, місця й речі кажуть «znát»."],
+  znát: ["«Znát» означає знати людину, місце чи річ: Znám Petra. Znám Prahu. Про факти й інформацію кажуть «vědět»."],
+  "líbit se": [
+    "Найчастіше вживається в 3-й особі: Líbí se mi to («Мені це подобається»). Форми «líbím se», «líbíš se» означають «я подобаюся», «ти подобаєшся».",
+  ],
+};
+
 export const verbs: Verb[] = verbsWithExamples.map((verb) => ({
   ...verb,
+  aspect: perfectiveInfinitives.has(verb.infinitive) ? "perfective" : "imperfective",
+  formalForms: getFormalForms(verb),
+  notes: verbNotes[verb.infinitive],
   exercises: buildExercises(verb, verbBase),
 }));

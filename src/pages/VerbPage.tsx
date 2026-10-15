@@ -4,6 +4,7 @@ import ConjugationTable from "../components/ConjugationTable";
 import ExamplesList from "../components/ExamplesList";
 import NicknameNotice from "../components/NicknameNotice";
 import SpeakButton from "../components/SpeakButton";
+import VerbNotes from "../components/VerbNotes";
 import { verbs } from "../data/verbs";
 import { useProgress } from "../hooks/useProgress";
 
@@ -87,6 +88,7 @@ export default function VerbPage() {
         <div className="space-y-3">
           <h2 className="text-xl font-semibold text-slate-950">Відмінювання</h2>
           <ConjugationTable conjugation={verb.conjugation} />
+          <VerbNotes verb={verb} />
         </div>
 
         <div className="space-y-3">

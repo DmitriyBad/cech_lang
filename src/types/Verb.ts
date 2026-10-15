@@ -22,6 +22,12 @@ export interface Verb {
     vy: string;
     oni: string;
   };
+  /** Вид дієслова. У доконаних форми «теперішнього часу» означають майбутній час (přijdu = «прийду»). */
+  aspect?: "imperfective" | "perfective";
+  /** Літературні варіанти розмовних форм таблиці (pracuju → pracuji, můžu → mohu). */
+  formalForms?: Partial<Verb["conjugation"]>;
+  /** Короткі пояснення до слова (вживання, відмінність від схожого дієслова). */
+  notes?: string[];
   examples: Example[];
   exercises: Exercise[];
 }

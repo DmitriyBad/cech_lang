@@ -26,6 +26,11 @@ export default function VerbCard({ verb, isLearned, needsReview, isLocked = fals
         </div>
 
         <div className="flex flex-wrap gap-2 text-xs font-medium">
+          {verb.aspect === "perfective" ? (
+            <span className="rounded-md bg-slate-100 px-2.5 py-1 text-slate-700" title="Форми означають майбутній час">
+              доконаний вид
+            </span>
+          ) : null}
           {isLearned ? <span className="rounded-md bg-emerald-50 px-2.5 py-1 text-emerald-700">Вивчено</span> : null}
           {needsReview ? (
             <span className="inline-flex items-center gap-1 rounded-md bg-amber-50 px-2.5 py-1 text-amber-700">
