@@ -1,7 +1,11 @@
 import { CheckCircle2, XCircle } from "lucide-react";
-import { useMemo, useState } from "react";
+import { FormEvent, useMemo, useRef, useState } from "react";
 import type { Exercise } from "../types/Verb";
+import { useAnswerMode } from "../hooks/useAnswerMode";
+import { isTypeable, matchAnswer, type MatchResult } from "../utils/answerMatch";
 import SpeakButton from "./SpeakButton";
+
+const czechLetters = ["á", "č", "ď", "é", "ě", "í", "ň", "ó", "ř", "š", "ť", "ú", "ů", "ý", "ž"];
 
 interface ExerciseBlockProps {
   exercise: Exercise;
@@ -11,8 +15,13 @@ interface ExerciseBlockProps {
 
 export default function ExerciseBlock({ exercise, index, onAnswer }: ExerciseBlockProps) {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
-  const isAnswered = selectedAnswer !== null;
-  const isCorrect = selectedAnswer === exercise.correctAnswer;
+  const [typedDraft, setTypedDraft] = useState("");
+  const [typedResult, setTypedResult] = useState<MatchResult | "gave-up" | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const mode = useAnswerMode();
+  const useTyping = mode === "typing" && isTypeable(exercise.correctAnswer);
+  const isAnswered = selectedAnswer !== null || typedResult !== null;
+  const isCorrect = typedResult !== null ? typedResult === "exact" || typedResult === "no-diacritics" : selectedAnswer === exercise.correctAnswer;
 
   // Fisher–Yates: правильна відповідь не повинна завжди стояти першою.
   const options = useMemo(() => {
@@ -73,6 +82,36 @@ export default function ExerciseBlock({ exercise, index, onAnswer }: ExerciseBlo
     onAnswer(answer === exercise.correctAnswer);
   };
 
+  const submitTyped = (event: FormEvent) => {
+    event.preventDefault();
+
+    if (isAnswered || typedDraft.trim().length === 0) {
+      return;
+    }
+
+    const result = matchAnswer(typedDraft, exercise.correctAnswer, exercise.options);
+    setTypedResult(result);
+    onAnswer(result !== "wrong");
+  };
+
+  const giveUp = () => {
+    if (!isAnswered) {
+      setTypedResult("gave-up");
+      onAnswer(false);
+    }
+  };
+
+  const insertLetter = (letter: string) => {
+    const input = inputRef.current;
+    const start = input?.selectionStart ?? typedDraft.length;
+    const end = input?.selectionEnd ?? typedDraft.length;
+    setTypedDraft(typedDraft.slice(0, start) + letter + typedDraft.slice(end));
+    requestAnimationFrame(() => {
+      input?.focus();
+      input?.setSelectionRange(start + 1, start + 1);
+    });
+  };
+
   return (
     <section className="rounded-lg border border-slate-200 bg-white p-4 shadow-soft">
       <div className="flex items-start gap-3">
@@ -87,6 +126,58 @@ export default function ExerciseBlock({ exercise, index, onAnswer }: ExerciseBlo
             </div>
           ) : null}
 
+          {useTyping ? (
+            <form onSubmit={submitTyped} className="mt-4 space-y-2">
+              <label className="block text-sm font-medium text-slate-700" htmlFor={"answer-" + index}>
+                Ваша відповідь чеською
+              </label>
+              <div className="flex flex-wrap gap-2">
+                <input
+                  id={"answer-" + index}
+                  ref={inputRef}
+                  lang="cs"
+                  value={typedDraft}
+                  onChange={(event) => setTypedDraft(event.target.value)}
+                  disabled={isAnswered}
+                  autoComplete="off"
+                  autoCapitalize="off"
+                  autoCorrect="off"
+                  spellCheck={false}
+                  className="focus-ring min-h-12 min-w-0 flex-1 rounded-md border border-slate-300 bg-white px-3 text-base text-slate-950 disabled:bg-slate-100"
+                />
+                <button
+                  type="submit"
+                  disabled={isAnswered || typedDraft.trim().length === 0}
+                  className="focus-ring min-h-12 rounded-md bg-blue-600 px-4 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-300"
+                >
+                  Перевірити
+                </button>
+                <button
+                  type="button"
+                  onClick={giveUp}
+                  disabled={isAnswered}
+                  className="focus-ring min-h-12 rounded-md px-3 text-sm font-semibold text-slate-600 hover:bg-slate-100 disabled:opacity-50"
+                >
+                  Не знаю
+                </button>
+              </div>
+              {!isAnswered ? (
+                <div className="flex flex-wrap gap-1" role="group" aria-label="Чеські літери">
+                  {czechLetters.map((letter) => (
+                    <button
+                      key={letter}
+                      type="button"
+                      lang="cs"
+                      onClick={() => insertLetter(letter)}
+                      className="focus-ring min-h-10 min-w-10 rounded-md border border-slate-200 bg-slate-50 text-base font-semibold text-slate-800 hover:bg-blue-50"
+                    >
+                      {letter}
+                    </button>
+                  ))}
+                </div>
+              ) : null}
+            </form>
+          ) : (
           <div className="mt-4 grid gap-2 sm:grid-cols-3">
             {options.map((option) => {
               const selected = selectedAnswer === option;
@@ -112,6 +203,7 @@ export default function ExerciseBlock({ exercise, index, onAnswer }: ExerciseBlo
               );
             })}
           </div>
+          )}
 
           {isAnswered ? (
             <div
@@ -123,7 +215,13 @@ export default function ExerciseBlock({ exercise, index, onAnswer }: ExerciseBlo
               ].join(" ")}
             >
               {isCorrect ? <CheckCircle2 size={18} aria-hidden="true" /> : <XCircle size={18} aria-hidden="true" />}
-              <span>{isCorrect ? "Правильно" : "Неправильно. Правильна відповідь: " + exercise.correctAnswer}</span>
+              <span>
+                {typedResult === "no-diacritics"
+                  ? "Правильно, але зверніть увагу на діакритику: " + exercise.correctAnswer
+                  : isCorrect
+                    ? "Правильно"
+                    : "Неправильно. Правильна відповідь: " + exercise.correctAnswer}
+              </span>
             </div>
           ) : null}
 

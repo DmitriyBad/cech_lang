@@ -1,6 +1,7 @@
 import { ArrowLeft, CheckCircle2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import AnswerModeToggle from "../components/AnswerModeToggle";
 import ExerciseBlock from "../components/ExerciseBlock";
 import ProgressBar from "../components/ProgressBar";
 import { nouns } from "../data/nouns";
@@ -53,6 +54,8 @@ export default function NounExercisePage() {
           <ProgressBar value={completedPercent} label="Виконано" />
         </div>
       </section>
+
+      <AnswerModeToggle />
 
       <div className="grid gap-4">
         {noun.exercises.map((exercise, index) => (
