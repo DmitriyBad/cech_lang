@@ -2,7 +2,6 @@ import { ArrowLeft } from "lucide-react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import ExamplesList from "../components/ExamplesList";
 import LessonCard from "../components/LessonCard";
-import NicknameNotice from "../components/NicknameNotice";
 import ProgressBar from "../components/ProgressBar";
 import { grammarModules } from "../data/grammarModules";
 import { useProgress } from "../hooks/useProgress";
@@ -10,7 +9,7 @@ import { useProgress } from "../hooks/useProgress";
 export default function ModuleOverviewPage() {
   const { moduleId } = useParams();
   const module = grammarModules.find((item) => item.id === moduleId);
-  const { getModuleStats, isLearningLocked } = useProgress();
+  const { getModuleStats } = useProgress();
 
   if (!module) {
     return <Navigate to="/modules" replace />;
@@ -30,8 +29,6 @@ export default function ModuleOverviewPage() {
         <ArrowLeft size={18} aria-hidden="true" />
         До граматики
       </Link>
-
-      {isLearningLocked ? <NicknameNotice /> : null}
 
       <section className="grid gap-4 lg:grid-cols-[1fr_360px] lg:items-end">
         <div>
@@ -66,7 +63,6 @@ export default function ModuleOverviewPage() {
                   key={lesson.id}
                   moduleId={module.id}
                   lesson={lesson}
-                  isLocked={isLearningLocked}
                   isLearned={stats.completedItemIds.includes(lesson.id)}
                 />
               ))}

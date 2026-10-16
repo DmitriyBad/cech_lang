@@ -2,7 +2,6 @@ import { ArrowLeft, CheckCircle2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import ExerciseBlock from "../components/ExerciseBlock";
-import NicknameNotice from "../components/NicknameNotice";
 import ProgressBar from "../components/ProgressBar";
 import { verbs } from "../data/verbs";
 import { useProgress } from "../hooks/useProgress";
@@ -12,7 +11,7 @@ export default function ExercisePage() {
   const verb = verbs.find((item) => item.id === Number(verbId));
   const [answeredIndexes, setAnsweredIndexes] = useState<number[]>([]);
   const [correctCount, setCorrectCount] = useState(0);
-  const { isLearningLocked, registerAnswer, markVerbLearned } = useProgress(verbs.length);
+  const { registerAnswer, markVerbLearned } = useProgress(verbs.length);
 
   const answeredSet = useMemo(() => new Set(answeredIndexes), [answeredIndexes]);
 
@@ -24,23 +23,6 @@ export default function ExercisePage() {
           <ArrowLeft size={18} aria-hidden="true" />
           На головну
         </Link>
-      </div>
-    );
-  }
-
-  if (isLearningLocked) {
-    return (
-      <div className="space-y-6">
-        <Link to="/" className="focus-ring inline-flex min-h-10 items-center gap-2 rounded-md px-2 text-sm font-semibold text-blue-700 hover:bg-blue-50">
-          <ArrowLeft size={18} aria-hidden="true" />
-          На головну
-        </Link>
-        <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-soft">
-          <h1 className="text-3xl font-bold text-slate-950 sm:text-4xl">Вправи: {verb.infinitive}</h1>
-          <div className="mt-5">
-            <NicknameNotice title="Вправи заблоковані без нікнейма" />
-          </div>
-        </section>
       </div>
     );
   }

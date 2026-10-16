@@ -1,6 +1,5 @@
 import { RotateCcw, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
-import NicknameNotice from "../components/NicknameNotice";
 import ProgressBar from "../components/ProgressBar";
 import { grammarModules } from "../data/grammarModules";
 import { nouns } from "../data/nouns";
@@ -11,7 +10,6 @@ export default function StatisticsPage() {
   const {
     activeNickname,
     getModuleStats,
-    isLearningLocked,
     progress,
     learnedCount,
     learnedPercent,
@@ -55,8 +53,6 @@ export default function StatisticsPage() {
           Скинути
         </button>
       </section>
-
-      {isLearningLocked ? <NicknameNotice title="Статистика доступна після введення нікнейма" /> : null}
 
       <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-soft">

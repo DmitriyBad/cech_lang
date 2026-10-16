@@ -1,4 +1,4 @@
-import { ArrowRight, LockKeyhole } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import type { Noun } from "../types/Noun";
 import SpeakButton from "./SpeakButton";
@@ -6,7 +6,6 @@ import SpeakButton from "./SpeakButton";
 interface NounCardProps {
   noun: Noun;
   isLearned: boolean;
-  isLocked: boolean;
 }
 
 const genderLabels: Record<Noun["gender"], string> = {
@@ -15,7 +14,7 @@ const genderLabels: Record<Noun["gender"], string> = {
   neuter: "середній",
 };
 
-export default function NounCard({ noun, isLearned, isLocked }: NounCardProps) {
+export default function NounCard({ noun, isLearned }: NounCardProps) {
   return (
     <article className="flex h-full flex-col justify-between rounded-lg border border-slate-200 bg-white p-4 shadow-soft">
       <div>
@@ -36,17 +35,10 @@ export default function NounCard({ noun, isLearned, isLocked }: NounCardProps) {
         </div>
       </div>
 
-      {isLocked ? (
-        <button type="button" disabled className="mt-5 inline-flex min-h-11 cursor-not-allowed items-center justify-center gap-2 rounded-md bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-500">
-          <LockKeyhole size={18} aria-hidden="true" />
-          Введіть нікнейм
-        </button>
-      ) : (
-        <Link to={"/nouns/" + noun.id} className="focus-ring mt-5 inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700">
+      <Link to={"/nouns/" + noun.id} className="focus-ring mt-5 inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700">
           Вивчати
           <ArrowRight size={18} aria-hidden="true" />
         </Link>
-      )}
     </article>
   );
 }

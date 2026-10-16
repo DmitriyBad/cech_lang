@@ -1,7 +1,6 @@
 import { CalendarDays, Hash, Layers3, MessageSquareText, Palette, Route } from "lucide-react";
 import { Link } from "react-router-dom";
 import LessonCard from "../components/LessonCard";
-import NicknameNotice from "../components/NicknameNotice";
 import ProgressBar from "../components/ProgressBar";
 import { grammarModules } from "../data/grammarModules";
 import { useProgress } from "../hooks/useProgress";
@@ -16,11 +15,10 @@ const iconMap = {
 };
 
 export default function ModulesPage() {
-  const { getModuleStats, isLearningLocked } = useProgress();
+  const { getModuleStats } = useProgress();
 
   return (
     <div className="space-y-6">
-      {isLearningLocked ? <NicknameNotice /> : null}
 
       <section>
         <h1 className="text-3xl font-bold text-slate-950 sm:text-4xl">Граматичні модулі</h1>
@@ -68,7 +66,6 @@ export default function ModulesPage() {
                     key={lesson.id}
                     moduleId={module.id}
                     lesson={lesson}
-                    isLocked={isLearningLocked}
                     isLearned={stats.completedItemIds.includes(lesson.id)}
                   />
                 ))}

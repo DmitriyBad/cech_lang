@@ -1,7 +1,7 @@
 import { BookOpen, Filter, RotateCcw, Trophy } from "lucide-react";
 import { useMemo, useState } from "react";
-import NicknameNotice from "../components/NicknameNotice";
 import ProgressBar from "../components/ProgressBar";
+import StartGuide from "../components/StartGuide";
 import SearchBar from "../components/SearchBar";
 import VerbCard from "../components/VerbCard";
 import { verbs } from "../data/verbs";
@@ -19,7 +19,7 @@ const filters: Array<{ label: string; value: LevelFilter }> = [
 export default function HomePage() {
   const [query, setQuery] = useState("");
   const [levelFilter, setLevelFilter] = useState<LevelFilter>("all");
-  const { progress, isLearningLocked, learnedCount, learnedPercent, reviewVerbIds, successRate } = useProgress(verbs.length);
+  const { progress, learnedCount, learnedPercent, reviewVerbIds, successRate } = useProgress(verbs.length);
 
   const filteredVerbs = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
@@ -35,11 +35,11 @@ export default function HomePage() {
     });
   }, [levelFilter, query]);
 
+  const isFreshVisitor = learnedCount === 0 && progress.correctAnswers + progress.wrongAnswers === 0;
   const reviewVerbs = verbs.filter((verb) => reviewVerbIds.includes(verb.id));
 
   return (
     <div className="space-y-6">
-      {isLearningLocked ? <NicknameNotice /> : null}
       <section className="grid gap-4 lg:grid-cols-[1fr_360px] lg:items-end">
         <div>
           <div className="flex items-center gap-3">
@@ -58,6 +58,9 @@ export default function HomePage() {
         </div>
       </section>
 
+      <StartGuide />
+
+      {isFreshVisitor ? null : (
       <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-soft">
           <p className="text-sm text-slate-500">Усього дієслів</p>
@@ -76,6 +79,7 @@ export default function HomePage() {
           <p className="mt-1 text-2xl font-bold text-slate-950">{reviewVerbIds.length}</p>
         </div>
       </section>
+      )}
 
       {reviewVerbs.length > 0 ? (
         <section className="space-y-3">
@@ -90,7 +94,6 @@ export default function HomePage() {
                 verb={verb}
                 isLearned={progress.learnedVerbIds.includes(verb.id)}
                 needsReview
-                isLocked={isLearningLocked}
               />
             ))}
           </div>
@@ -131,7 +134,6 @@ export default function HomePage() {
               verb={verb}
               isLearned={progress.learnedVerbIds.includes(verb.id)}
               needsReview={reviewVerbIds.includes(verb.id)}
-              isLocked={isLearningLocked}
             />
           ))}
         </div>

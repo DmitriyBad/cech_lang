@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   StoredProgress,
+  adoptGuestProgress,
   emptyProgress,
   loadActiveNickname,
   loadProgress,
-  normalizeNickname,
   resetStoredProgress,
   saveActiveNickname,
   saveProgress,
@@ -43,6 +43,8 @@ export function useProgress(totalVerbs = 0) {
   useEffect(() => subscribeToProgress(refreshProgress), [refreshProgress]);
 
   const changeNickname = useCallback((nickname: string) => {
+    // Прогрес гостя переходить до нового нікнейма, якщо цей профіль ще порожній.
+    adoptGuestProgress(nickname);
     const nextNickname = saveActiveNickname(nickname);
     setActiveNickname(nextNickname);
     setProgress(loadProgress(nextNickname));
@@ -51,11 +53,6 @@ export function useProgress(totalVerbs = 0) {
 
   const updateProgress = useCallback((updater: (current: StoredProgress) => StoredProgress) => {
     const nickname = loadActiveNickname();
-
-    if (!normalizeNickname(nickname)) {
-      return;
-    }
-
     const nextProgress = updater(loadProgress(nickname));
     saveProgress(nickname, nextProgress);
     setActiveNickname(nickname);
@@ -188,7 +185,6 @@ export function useProgress(totalVerbs = 0) {
   const totalAnswers = progress.correctAnswers + progress.wrongAnswers;
   const successRate = totalAnswers === 0 ? 0 : Math.round((progress.correctAnswers / totalAnswers) * 100);
   const learnedPercent = totalVerbs === 0 ? 0 : Math.round((progress.learnedVerbIds.length / totalVerbs) * 100);
-  const isLearningLocked = normalizeNickname(activeNickname).length === 0;
 
   const reviewVerbIds = useMemo(
     () =>
@@ -201,7 +197,6 @@ export function useProgress(totalVerbs = 0) {
   return {
     activeNickname,
     changeNickname,
-    isLearningLocked,
     progress,
     learnedCount: progress.learnedVerbIds.length,
     learnedPercent,

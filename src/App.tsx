@@ -10,6 +10,8 @@ import ModulesPage from "./pages/ModulesPage";
 import NounExercisePage from "./pages/NounExercisePage";
 import NounPage from "./pages/NounPage";
 import NounsPage from "./pages/NounsPage";
+import PhrasesPage from "./pages/PhrasesPage";
+import PronunciationPage from "./pages/PronunciationPage";
 import StatisticsPage from "./pages/StatisticsPage";
 import VerbPage from "./pages/VerbPage";
 
@@ -29,6 +31,8 @@ export default function App() {
           <Route path="/modules/:moduleId" element={<ModuleOverviewPage />} />
           <Route path="/modules/:moduleId/:lessonId" element={<ModulePage />} />
           <Route path="/modules/:moduleId/:lessonId/exercises" element={<ModuleExercisePage />} />
+          <Route path="/start/pronunciation" element={<PronunciationPage />} />
+          <Route path="/start/phrases" element={<PhrasesPage />} />
           <Route path="/statistics" element={<StatisticsPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

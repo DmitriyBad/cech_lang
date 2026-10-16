@@ -1,7 +1,6 @@
 import { ArrowLeft, CheckCircle2, PencilLine } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import ExamplesList from "../components/ExamplesList";
-import NicknameNotice from "../components/NicknameNotice";
 import { grammarModules } from "../data/grammarModules";
 import { useProgress } from "../hooks/useProgress";
 
@@ -9,7 +8,7 @@ export default function ModulePage() {
   const { moduleId, lessonId } = useParams();
   const module = grammarModules.find((item) => item.id === moduleId);
   const lesson = module?.lessons.find((item) => item.id === lessonId);
-  const { getModuleStats, isLearningLocked, markModuleItemLearned } = useProgress();
+  const { getModuleStats, markModuleItemLearned } = useProgress();
 
   if (!module || !lesson) {
     return <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-soft">Урок не знайдено</div>;
@@ -17,18 +16,6 @@ export default function ModulePage() {
 
   const stats = getModuleStats(module.id, module.lessons.length);
   const isLearned = stats.completedItemIds.includes(lesson.id);
-
-  if (isLearningLocked) {
-    return (
-      <div className="space-y-6">
-        <Link to="/modules" className="focus-ring inline-flex min-h-10 items-center gap-2 rounded-md px-2 text-sm font-semibold text-blue-700 hover:bg-blue-50">
-          <ArrowLeft size={18} aria-hidden="true" />
-          До модулів
-        </Link>
-        <NicknameNotice title="Граматичні модулі заблоковані без нікнейма" />
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">

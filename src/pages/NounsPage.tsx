@@ -1,7 +1,6 @@
 import { BookMarked, Filter } from "lucide-react";
 import { useMemo, useState } from "react";
 import NounCard from "../components/NounCard";
-import NicknameNotice from "../components/NicknameNotice";
 import ProgressBar from "../components/ProgressBar";
 import SearchBar from "../components/SearchBar";
 import { caseInfo, nouns } from "../data/nouns";
@@ -20,7 +19,7 @@ const filters: Array<{ label: string; value: GenderFilter }> = [
 export default function NounsPage() {
   const [query, setQuery] = useState("");
   const [genderFilter, setGenderFilter] = useState<GenderFilter>("all");
-  const { getModuleStats, isLearningLocked } = useProgress();
+  const { getModuleStats } = useProgress();
   const nounStats = getModuleStats("nouns", nouns.length);
 
   const filteredNouns = useMemo(() => {
@@ -39,7 +38,6 @@ export default function NounsPage() {
 
   return (
     <div className="space-y-6">
-      {isLearningLocked ? <NicknameNotice /> : null}
 
       <section className="grid gap-4 lg:grid-cols-[1fr_360px] lg:items-end">
         <div className="flex items-center gap-3">
@@ -92,7 +90,6 @@ export default function NounsPage() {
             <NounCard
               key={noun.id}
               noun={noun}
-              isLocked={isLearningLocked}
               isLearned={nounStats.completedItemIds.includes(String(noun.id))}
             />
           ))}

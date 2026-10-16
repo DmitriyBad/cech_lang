@@ -46,6 +46,20 @@ export const normalizeNickname = (nickname: string) => nickname.trim().replace(/
 
 const nicknameKey = (nickname: string) => normalizeNickname(nickname).toLocaleLowerCase("uk-UA");
 
+// Без нікнейма прогрес зберігається в профілі «гість». Ключ службовий: користувач не може його вибрати.
+export const GUEST_PROFILE_KEY = "__guest__";
+
+const isReservedNickname = (nickname: string) => nicknameKey(nickname) === GUEST_PROFILE_KEY;
+
+const profileKey = (nickname: string) => nicknameKey(nickname) || GUEST_PROFILE_KEY;
+
+const hasActivity = (progress: StoredProgress) =>
+  progress.learnedVerbIds.length > 0 ||
+  progress.correctAnswers + progress.wrongAnswers > 0 ||
+  Object.values(progress.moduleProgress).some(
+    (module) => module.completedItemIds.length > 0 || module.correctAnswers + module.wrongAnswers > 0,
+  );
+
 const normalizeModuleProgress = (value: Partial<ModuleProgress> | null | undefined): ModuleProgress => ({
   completedItemIds: Array.isArray(value?.completedItemIds) ? value.completedItemIds.map(String) : [],
   correctAnswers: Number.isFinite(value?.correctAnswers) ? Number(value?.correctAnswers) : 0,
@@ -124,7 +138,8 @@ export const saveActiveNickname = (nickname: string) => {
     return "";
   }
 
-  const normalizedNickname = normalizeNickname(nickname);
+  // Службова назва профілю гостя не може бути нікнеймом.
+  const normalizedNickname = isReservedNickname(nickname) ? "" : normalizeNickname(nickname);
 
   try {
     if (normalizedNickname) {
@@ -140,39 +155,44 @@ export const saveActiveNickname = (nickname: string) => {
   return normalizedNickname;
 };
 
-export const loadProgress = (nickname = loadActiveNickname()): StoredProgress => {
-  const normalizedNickname = normalizeNickname(nickname);
-
-  if (!normalizedNickname) {
-    return emptyProgress;
-  }
-
-  return normalizeProgress(loadProgressStore()[nicknameKey(normalizedNickname)]);
-};
+export const loadProgress = (nickname = loadActiveNickname()): StoredProgress =>
+  normalizeProgress(loadProgressStore()[profileKey(nickname)]);
 
 export const saveProgress = (nickname: string, progress: StoredProgress) => {
-  const normalizedNickname = normalizeNickname(nickname);
-
-  if (!normalizedNickname) {
-    return;
-  }
-
   saveProgressStore({
     ...loadProgressStore(),
-    [nicknameKey(normalizedNickname)]: normalizeProgress(progress),
+    [profileKey(nickname)]: normalizeProgress(progress),
   });
 };
 
 export const resetStoredProgress = (nickname: string) => {
-  const normalizedNickname = normalizeNickname(nickname);
+  const store = loadProgressStore();
+  delete store[profileKey(nickname)];
+  saveProgressStore(store);
+};
 
-  if (!normalizedNickname) {
-    return;
+/**
+ * Переносить прогрес гостя в профіль нікнейма, якщо цей профіль ще порожній (нового користувача).
+ * Якщо профіль нікнейма вже існує, нічого не чіпаємо, щоб не перезаписати чужий прогрес.
+ * Повертає true, коли прогрес перенесено.
+ */
+export const adoptGuestProgress = (nickname: string): boolean => {
+  const key = nicknameKey(nickname);
+
+  if (!key || key === GUEST_PROFILE_KEY) {
+    return false;
   }
 
   const store = loadProgressStore();
-  delete store[nicknameKey(normalizedNickname)];
-  saveProgressStore(store);
+  const guest = store[GUEST_PROFILE_KEY];
+
+  if (!guest || store[key] || !hasActivity(guest)) {
+    return false;
+  }
+
+  const { [GUEST_PROFILE_KEY]: _guest, ...rest } = store;
+  saveProgressStore({ ...rest, [key]: guest });
+  return true;
 };
 
 export const subscribeToProgress = (listener: () => void) => {

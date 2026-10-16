@@ -44,7 +44,7 @@ export default function Header() {
               value={nicknameDraft}
               onChange={(event) => setNicknameDraft(event.target.value)}
               className="focus-ring min-h-10 w-full rounded-md border border-slate-200 bg-white py-2 pl-10 pr-3 text-sm font-medium text-slate-950 placeholder:text-slate-400"
-              placeholder="Введіть нікнейм"
+              placeholder="Ваш нікнейм"
               type="text"
               autoComplete="nickname"
               maxLength={32}

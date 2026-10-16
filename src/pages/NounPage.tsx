@@ -1,7 +1,6 @@
 import { ArrowLeft, CheckCircle2, PencilLine } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import ExamplesList from "../components/ExamplesList";
-import NicknameNotice from "../components/NicknameNotice";
 import NounDeclensionTable from "../components/NounDeclensionTable";
 import SpeakButton from "../components/SpeakButton";
 import { nouns } from "../data/nouns";
@@ -10,7 +9,7 @@ import { useProgress } from "../hooks/useProgress";
 export default function NounPage() {
   const { nounId } = useParams();
   const noun = nouns.find((item) => item.id === Number(nounId));
-  const { getModuleStats, isLearningLocked, markModuleItemLearned } = useProgress();
+  const { getModuleStats, markModuleItemLearned } = useProgress();
 
   if (!noun) {
     return (
@@ -26,18 +25,6 @@ export default function NounPage() {
 
   const nounStats = getModuleStats("nouns", nouns.length);
   const isLearned = nounStats.completedItemIds.includes(String(noun.id));
-
-  if (isLearningLocked) {
-    return (
-      <div className="space-y-6">
-        <Link to="/nouns" className="focus-ring inline-flex min-h-10 items-center gap-2 rounded-md px-2 text-sm font-semibold text-blue-700 hover:bg-blue-50">
-          <ArrowLeft size={18} aria-hidden="true" />
-          До іменників
-        </Link>
-        <NicknameNotice title="Іменники заблоковані без нікнейма" />
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">

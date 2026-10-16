@@ -2,7 +2,6 @@ import { ArrowLeft, CheckCircle2, PencilLine } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import ConjugationTable from "../components/ConjugationTable";
 import ExamplesList from "../components/ExamplesList";
-import NicknameNotice from "../components/NicknameNotice";
 import SpeakButton from "../components/SpeakButton";
 import VerbNotes from "../components/VerbNotes";
 import { verbs } from "../data/verbs";
@@ -11,7 +10,7 @@ import { useProgress } from "../hooks/useProgress";
 export default function VerbPage() {
   const { verbId } = useParams();
   const verb = verbs.find((item) => item.id === Number(verbId));
-  const { progress, isLearningLocked, markVerbLearned } = useProgress(verbs.length);
+  const { progress, markVerbLearned } = useProgress(verbs.length);
 
   if (!verb) {
     return (
@@ -26,26 +25,6 @@ export default function VerbPage() {
   }
 
   const isLearned = progress.learnedVerbIds.includes(verb.id);
-
-  if (isLearningLocked) {
-    return (
-      <div className="space-y-6">
-        <Link to="/" className="focus-ring inline-flex min-h-10 items-center gap-2 rounded-md px-2 text-sm font-semibold text-blue-700 hover:bg-blue-50">
-          <ArrowLeft size={18} aria-hidden="true" />
-          На головну
-        </Link>
-        <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-soft">
-          <span className="rounded-md bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700">{verb.level}</span>
-          <h1 className="mt-3 text-3xl font-bold text-slate-950 sm:text-4xl">
-            <span lang="cs">{verb.infinitive}</span> <SpeakButton text={verb.infinitive} /> — {verb.translation}
-          </h1>
-          <div className="mt-5">
-            <NicknameNotice title="Навчання заблоковане без нікнейма" />
-          </div>
-        </section>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">

@@ -2,7 +2,6 @@ import { ArrowLeft, CheckCircle2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import ExerciseBlock from "../components/ExerciseBlock";
-import NicknameNotice from "../components/NicknameNotice";
 import ProgressBar from "../components/ProgressBar";
 import { grammarModules } from "../data/grammarModules";
 import { useProgress } from "../hooks/useProgress";
@@ -13,23 +12,11 @@ export default function ModuleExercisePage() {
   const lesson = module?.lessons.find((item) => item.id === lessonId);
   const [answeredIndexes, setAnsweredIndexes] = useState<number[]>([]);
   const [correctCount, setCorrectCount] = useState(0);
-  const { isLearningLocked, markModuleItemLearned, registerModuleAnswer } = useProgress();
+  const { markModuleItemLearned, registerModuleAnswer } = useProgress();
   const answeredSet = useMemo(() => new Set(answeredIndexes), [answeredIndexes]);
 
   if (!module || !lesson) {
     return <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-soft">Вправи не знайдено</div>;
-  }
-
-  if (isLearningLocked) {
-    return (
-      <div className="space-y-6">
-        <Link to="/modules" className="focus-ring inline-flex min-h-10 items-center gap-2 rounded-md px-2 text-sm font-semibold text-blue-700 hover:bg-blue-50">
-          <ArrowLeft size={18} aria-hidden="true" />
-          До модулів
-        </Link>
-        <NicknameNotice title="Вправи заблоковані без нікнейма" />
-      </div>
-    );
   }
 
   const completedPercent = Math.round((answeredIndexes.length / lesson.exercises.length) * 100);

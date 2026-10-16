@@ -1,4 +1,4 @@
-import { ArrowRight, LockKeyhole, RotateCcw } from "lucide-react";
+import { ArrowRight, RotateCcw } from "lucide-react";
 import { Link } from "react-router-dom";
 import type { Verb } from "../types/Verb";
 import SpeakButton from "./SpeakButton";
@@ -7,10 +7,9 @@ interface VerbCardProps {
   verb: Verb;
   isLearned: boolean;
   needsReview: boolean;
-  isLocked?: boolean;
 }
 
-export default function VerbCard({ verb, isLearned, needsReview, isLocked = false }: VerbCardProps) {
+export default function VerbCard({ verb, isLearned, needsReview }: VerbCardProps) {
   return (
     <article className="flex h-full flex-col justify-between rounded-lg border border-slate-200 bg-white p-4 shadow-soft">
       <div className="space-y-3">
@@ -41,24 +40,13 @@ export default function VerbCard({ verb, isLearned, needsReview, isLocked = fals
         </div>
       </div>
 
-      {isLocked ? (
-        <button
-          type="button"
-          disabled
-          className="mt-5 inline-flex min-h-11 cursor-not-allowed items-center justify-center gap-2 rounded-md bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-500"
-        >
-          <LockKeyhole size={18} aria-hidden="true" />
-          Введіть нікнейм
-        </button>
-      ) : (
-        <Link
+      <Link
           to={"/verbs/" + verb.id}
           className="focus-ring mt-5 inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
         >
           Вивчати
           <ArrowRight size={18} aria-hidden="true" />
         </Link>
-      )}
     </article>
   );
 }
