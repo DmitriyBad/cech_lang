@@ -1,20 +1,21 @@
 import { useSyncExternalStore } from "react";
 
-export type AnswerMode = "choice" | "typing";
+export type AnswerMode = "choice" | "typing" | "mixed";
 
 const KEY = "czech-learning-answer-mode-v1";
 const EVENT = "czech-learning-answer-mode";
 
 const read = (): AnswerMode => {
   try {
-    return window.localStorage.getItem(KEY) === "typing" ? "typing" : "choice";
+    const stored = window.localStorage.getItem(KEY);
+    return stored === "typing" || stored === "choice" ? stored : memoryMode;
   } catch {
     return memoryMode;
   }
 };
 
 // Запасний варіант, коли localStorage недоступний.
-let memoryMode: AnswerMode = "choice";
+let memoryMode: AnswerMode = "mixed";
 
 export const setAnswerMode = (mode: AnswerMode) => {
   memoryMode = mode;
@@ -36,5 +37,5 @@ const subscribe = (listener: () => void) => {
 };
 
 export function useAnswerMode(): AnswerMode {
-  return useSyncExternalStore(subscribe, read, () => "choice");
+  return useSyncExternalStore(subscribe, read, () => "mixed");
 }

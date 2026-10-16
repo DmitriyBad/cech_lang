@@ -19,7 +19,10 @@ export default function ExerciseBlock({ exercise, index, onAnswer }: ExerciseBlo
   const [typedResult, setTypedResult] = useState<MatchResult | "gave-up" | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const mode = useAnswerMode();
-  const useTyping = mode === "typing" && isTypeable(exercise.correctAnswer);
+  // У змішаному режимі вводимо кожну другу вправу (1-ша, 3-тя… з вибором, 2-га, 4-та… з введенням):
+  // розминка вибором, потім пригадування. Нетипові для вводу вправи завжди лишаються з вибором.
+  const wantsTyping = mode === "typing" || (mode === "mixed" && index % 2 === 1);
+  const useTyping = wantsTyping && isTypeable(exercise.correctAnswer);
   const isAnswered = selectedAnswer !== null || typedResult !== null;
   const isCorrect = typedResult !== null ? typedResult === "exact" || typedResult === "no-diacritics" : selectedAnswer === exercise.correctAnswer;
 

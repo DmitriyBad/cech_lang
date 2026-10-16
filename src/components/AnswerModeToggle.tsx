@@ -3,8 +3,9 @@ import { setAnswerMode, useAnswerMode } from "../hooks/useAnswerMode";
 export default function AnswerModeToggle() {
   const mode = useAnswerMode();
   const options = [
-    { value: "choice", label: "Вибір відповіді" },
-    { value: "typing", label: "Ввести самому" },
+    { value: "mixed", label: "Змішано" },
+    { value: "choice", label: "Лише вибір" },
+    { value: "typing", label: "Лише введення" },
   ] as const;
 
   return (
@@ -25,10 +26,10 @@ export default function AnswerModeToggle() {
           </button>
         ))}
       </div>
-      {mode === "typing" ? (
+      {mode !== "choice" ? (
         <p className="text-xs text-slate-600">
-          Чеські відповіді вводяться з клавіатури; без діакритики теж зарахуємо, але підкажемо правильне написання.
-          Вправи з відповіддю українською лишаються з вибором.
+          {mode === "mixed" ? "Частину чеських відповідей потрібно ввести самому, решту обрати. " : "Усі чеські відповіді вводяться з клавіатури. "}
+          Без діакритики теж зарахуємо, але підкажемо правильне написання. Вправи з відповіддю українською лишаються з вибором.
         </p>
       ) : null}
     </div>
