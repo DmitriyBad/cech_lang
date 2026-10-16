@@ -1,4 +1,4 @@
-import { CheckCircle2, XCircle } from "lucide-react";
+import { CheckCircle2, ChevronDown, ChevronUp, Keyboard, XCircle } from "lucide-react";
 import { FormEvent, useMemo, useRef, useState } from "react";
 import type { Exercise } from "../types/Verb";
 import { useAnswerMode } from "../hooks/useAnswerMode";
@@ -17,6 +17,7 @@ export default function ExerciseBlock({ exercise, index, onAnswer }: ExerciseBlo
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [typedDraft, setTypedDraft] = useState("");
   const [typedResult, setTypedResult] = useState<MatchResult | "gave-up" | null>(null);
+  const [showKeys, setShowKeys] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const mode = useAnswerMode();
   // У змішаному режимі вводимо кожну другу вправу (1-ша, 3-тя… з вибором, 2-га, 4-та… з введенням):
@@ -165,18 +166,33 @@ export default function ExerciseBlock({ exercise, index, onAnswer }: ExerciseBlo
                 </button>
               </div>
               {!isAnswered ? (
-                <div className="flex flex-wrap gap-1" role="group" aria-label="Чеські літери">
-                  {czechLetters.map((letter) => (
-                    <button
-                      key={letter}
-                      type="button"
-                      lang="cs"
-                      onClick={() => insertLetter(letter)}
-                      className="focus-ring min-h-10 min-w-10 rounded-md border border-slate-200 bg-slate-50 text-base font-semibold text-slate-800 hover:bg-blue-50"
-                    >
-                      {letter}
-                    </button>
-                  ))}
+                <div>
+                  <button
+                    type="button"
+                    aria-expanded={showKeys}
+                    aria-controls={"keys-" + index}
+                    onClick={() => setShowKeys((value) => !value)}
+                    className="focus-ring inline-flex min-h-10 items-center gap-2 rounded-md px-2 text-sm font-semibold text-blue-700 hover:bg-blue-50"
+                  >
+                    <Keyboard size={18} aria-hidden="true" />
+                    Чеські літери
+                    {showKeys ? <ChevronUp size={16} aria-hidden="true" /> : <ChevronDown size={16} aria-hidden="true" />}
+                  </button>
+                  {showKeys ? (
+                    <div id={"keys-" + index} className="mt-1 flex flex-wrap gap-1" role="group" aria-label="Чеські літери">
+                      {czechLetters.map((letter) => (
+                        <button
+                          key={letter}
+                          type="button"
+                          lang="cs"
+                          onClick={() => insertLetter(letter)}
+                          className="focus-ring min-h-10 min-w-10 rounded-md border border-slate-200 bg-slate-50 text-base font-semibold text-slate-800 hover:bg-blue-50"
+                        >
+                          {letter}
+                        </button>
+                      ))}
+                    </div>
+                  ) : null}
                 </div>
               ) : null}
             </form>
