@@ -9,6 +9,7 @@ import ModulePage from "./pages/ModulePage";
 import ModulesPage from "./pages/ModulesPage";
 import NounExercisePage from "./pages/NounExercisePage";
 import NounPage from "./pages/NounPage";
+import NounRulesPage from "./pages/NounRulesPage";
 import NounsPage from "./pages/NounsPage";
 import PhrasesPage from "./pages/PhrasesPage";
 import PronunciationPage from "./pages/PronunciationPage";
@@ -25,6 +26,8 @@ export default function App() {
           <Route path="/verbs/:verbId" element={<VerbPage />} />
           <Route path="/verbs/:verbId/exercises" element={<ExercisePage />} />
           <Route path="/nouns" element={<NounsPage />} />
+          <Route path="/nouns/rules" element={<NounRulesPage />} />
+          <Route path="/nouns/rules/:patternId" element={<NounRulesPage />} />
           <Route path="/nouns/:nounId" element={<NounPage />} />
           <Route path="/nouns/:nounId/exercises" element={<NounExercisePage />} />
           <Route path="/modules" element={<ModulesPage />} />

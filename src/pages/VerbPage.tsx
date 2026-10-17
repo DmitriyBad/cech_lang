@@ -1,5 +1,6 @@
 import { ArrowLeft, CheckCircle2, PencilLine } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
+import PastTenseTable from "../components/PastTenseTable";
 import ConjugationTable from "../components/ConjugationTable";
 import ExamplesList from "../components/ExamplesList";
 import SpeakButton from "../components/SpeakButton";
@@ -64,13 +65,15 @@ export default function VerbPage() {
       </section>
 
       <section className="grid gap-5 lg:grid-cols-[420px_1fr]">
-        <div className="space-y-3">
-          <h2 className="text-xl font-semibold text-slate-950">Відмінювання</h2>
+        <div className="min-w-0 space-y-3">
+          <h2 className="text-xl font-semibold text-slate-950">Теперішній час</h2>
           <ConjugationTable conjugation={verb.conjugation} />
           <VerbNotes verb={verb} />
+          <h2 className="pt-3 text-xl font-semibold text-slate-950">Минулий час</h2>
+          <PastTenseTable infinitive={verb.infinitive} />
         </div>
 
-        <div className="space-y-3">
+        <div className="min-w-0 space-y-3">
           <h2 className="text-xl font-semibold text-slate-950">Приклади</h2>
           <ExamplesList examples={verb.examples} />
         </div>

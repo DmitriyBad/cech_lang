@@ -1,4 +1,4 @@
-import { CalendarDays, Hash, Layers3, MessageSquareText, Palette, Route } from "lucide-react";
+import { CalendarDays, Clock, Hash, Layers3, MessageSquareText, Palette, Route } from "lucide-react";
 import { Link } from "react-router-dom";
 import LessonCard from "../components/LessonCard";
 import ProgressBar from "../components/ProgressBar";
@@ -12,6 +12,7 @@ const iconMap = {
   palette: Palette,
   route: Route,
   messages: MessageSquareText,
+  clock: Clock,
 };
 
 export default function ModulesPage() {

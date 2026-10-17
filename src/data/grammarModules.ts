@@ -103,6 +103,17 @@ const numberReferenceItems = [
 ];
 
 const moduleReferences: Record<string, { referenceTitle: string; referenceItems: string[] }> = {
+  tenses: {
+    referenceTitle: "Минулий час: допоміжне jsem",
+    referenceItems: [
+      "já — jsem dělal / jsem dělala",
+      "ty — jsi dělal / jsi dělala",
+      "on / ona / ono — dělal / dělala / dělalo (без допоміжного)",
+      "my — jsme dělali / jsme dělaly",
+      "vy — jste dělali / jste dělaly (до однієї людини: jste dělal / jste dělala)",
+      "oni / ony — dělali / dělaly (без допоміжного)",
+    ],
+  },
   numbers: {
     referenceTitle: "Числа і написання",
     referenceItems: numberReferenceItems,
@@ -682,6 +693,22 @@ const rawModules = [
           "Jedeme v pátek ráno."
         ]
       ]
+    ]
+  },
+  {
+    "id": "tenses",
+    "title": "Теперішній і минулий час",
+    "subtitle": "Як змінюється дієслово: що я роблю зараз і що робив учора.",
+    "icon": "clock",
+    "lessons": [
+      ["tenses-present-a", "Теперішній час: dělat, čekat", "dělám, děláš, dělá", "A1", "Більшість дієслів на -at (dělat, čekat, hledat, poslouchat, snídat) змінюються за особами так: já -ám, ty -áš, on/ona/ono -á, my -áme, vy -áte, oni -ají.\nОсобовий займенник (já, ty, my…) зазвичай опускають: Dělám úkol. Він потрібен лише для підкреслення: Já dělám, ale ty ne.\nЧеське теперішнє відповідає і українському «роблю», і «роблю зараз»: окремої форми для тривалості немає.\nУ вправах особу визначайте за українським перекладом.", ["Dělám úkol.", "Co děláš večer?", "Studenti dělají cvičení."]],
+      ["tenses-present-i", "Теперішній час: mluvit, bydlet", "mluvím, mluvíš, mluví", "A1", "Більшість дієслів на -it, -et, -ět (mluvit, bydlet, platit, vidět, učit) мають закінчення: já -ím, ty -íš, on/ona/ono -í, my -íme, vy -íte, oni -í.\nЗверніть увагу: форми «він» і «вони» однакові: on bydlí, oni bydlí. Їх відрізняють за змістом і за підметом.", ["Mluvím česky.", "Petr bydlí v Praze.", "Kde bydlíte?"]],
+      ["tenses-present-uju", "Теперішній час: pracovat, kupovat", "pracuji, pracuješ, pracuje", "A1", "Дієслова на -ovat (pracovat, studovat, kupovat, cestovat, potřebovat) змінюють -ova- на -uj-: já pracuji, ty pracuješ, on pracuje, my pracujeme, vy pracujete, oni pracují.\nУ розмовній мові часто кажуть pracuju (я) і pracujou (вони). Це нормально, але на письмі й у школі вчать форми з -uji, -ují.", ["Pracuji v kanceláři.", "Studenti studují češtinu.", "Cestujeme vlakem."]],
+      ["tenses-past-form", "Минулий час: як утворюється", "dělal jsem, byl jsem", "A1", "Минулий час складається з двох частин: допоміжного дієслова být у теперішньому часі (jsem, jsi, jsme, jste) і форми на -l: у більшості дієслів від інфінітива відкидаємо -t і додаємо -l: dělat → dělal, mluvit → mluvil, bydlet → bydlel, studovat → studoval.\nУ першій і другій особі допоміжне дієслово обов'язкове: dělal jsem, dělal jsi, dělali jsme, dělali jste. У третій особі його немає: dělal, dělali.\nJsem, jsi, jsme, jste зазвичай не стоять на початку речення: Včera jsem dělal úkol або Dělal jsem úkol.", ["Včera jsem dělal úkol.", "Mluvil jsem s lékařem.", "Oni bydleli v Brně."]],
+      ["tenses-past-gender", "Минулий час: рід і число", "byl, byla, bylo, byli, byly", "A1", "Форма на -l узгоджується з тим, хто діє: чоловічий рід -l (byl), жіночий -la (byla), середній -lo (bylo), множина чоловіків -li (byli); множина жіночого роду й неживих чоловічих іменників -ly (ženy byly, domy byly); множина середнього роду -la (auta byla).\nЧоловік каже: byl jsem, жінка: byla jsem. Якщо серед тих, хто діє, є хоча б один чоловік, вживаємо -li: my jsme byli.\nСлово děti вживається з -ly: děti hrály (не hráli).\nЧемне «vy» до однієї людини: Vy jste byl (до чоловіка), Vy jste byla (до жінки), а до кількох: Vy jste byli.\nУ вправах рід і час визначайте за українським перекладом.", ["Petr byl doma.", "Anna byla v kavárně.", "Auto bylo drahé."]],
+      ["tenses-past-irregular", "Минулий час: неправильні форми", "šel, mohl, četl, řekl, jedl", "A2", "У частині дієслів форма на -l не збігається з інфінітивом, і її треба запам'ятати: být → byl, mít → měl, jít → šel (šla, šlo, šli, šly), moci → mohl, číst → četl, říct → řekl, jíst → jedl, vzít → vzal, najít → našel, přinést → přinesl.\nЗакінчення -a, -o, -i, -y додаються так само: šel, šla, šlo, šli, šly.", ["Včera jsem šel domů.", "Měl jsem hlad.", "Řekl jsem to učiteli."]],
+      ["tenses-past-neg-refl", "Минулий час: заперечення і se", "nebyl jsem, díval jsem se", "A2", "Заперечення ne- додається до форми на -l: byl → nebyl, šel → nešel, rozuměla → nerozuměla. Допоміжне jsem залишається окремо: Nebyl jsem doma.\nЧастки se та si в минулому часі стоять після jsem/jsi/jsme/jste: Díval jsem se. Vrátil jsem se. У третій особі jsem немає: Petr se bál.\nУ другій особі jsi se часто стягується в ses: ty ses díval (= ty jsi se díval); так само jsi si → sis: ty sis pamatoval.", ["Nebyl jsem doma.", "Díval jsem se na film.", "Petr se bál tmy."]],
+      ["tenses-choose", "Теперішній чи минулий: слова-підказки", "dnes, teď, včera, minulý týden", "A1", "Слова часу підказують, яку форму обрати. Теперішній: teď (зараз), každý den (щодня), obvykle (зазвичай). Слово dnes (сьогодні) може стояти і з минулим (Dnes ráno jsem pracoval), тож дивіться на зміст. Минулий: včera (вчора), minulý týden (минулого тижня), před hodinou (годину тому), loni (торік).\nУ доконаних дієслів «теперішня» форма означає майбутнє: přijdu zítra — прийду завтра (доконані дієслова: přijít, koupit, napsat).", ["Dnes pracuji doma.", "Včera jsem pracoval v kanceláři.", "Teď čekám na autobus."]]
     ]
   }
 ];

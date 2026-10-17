@@ -21,6 +21,8 @@ export interface Noun {
   animate?: boolean;
   /** Слово майже не вживається в множині (ovoce, nádobí, zboží…). */
   pluralRare?: boolean;
+  /** Зразок відмінювання зі сторінки правил (id з declensionRules); немає для рідкісних типів. */
+  patternId?: string;
   singular: NounCaseForms;
   plural: NounCaseForms;
   examples: Example[];

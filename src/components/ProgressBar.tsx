@@ -14,7 +14,7 @@ export default function ProgressBar({ value, label }: ProgressBarProps) {
           <span>{normalizedValue}%</span>
         </div>
       ) : null}
-      <div className="h-3 overflow-hidden rounded-md bg-slate-200" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={normalizedValue}>
+      <div className="h-3 overflow-hidden rounded-md bg-slate-200" role="progressbar" aria-label={label ?? "Прогрес"} aria-valuemin={0} aria-valuemax={100} aria-valuenow={normalizedValue}>
         <div className="h-full rounded-md bg-blue-600 transition-all" style={{ width: normalizedValue + "%" }} />
       </div>
     </div>

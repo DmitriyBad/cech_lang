@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import ExamplesList from "../components/ExamplesList";
 import NounDeclensionTable from "../components/NounDeclensionTable";
 import SpeakButton from "../components/SpeakButton";
+import { declensionPatterns } from "../data/declensionRules";
 import { nouns } from "../data/nouns";
 import { useProgress } from "../hooks/useProgress";
 
@@ -23,6 +24,7 @@ export default function NounPage() {
     );
   }
 
+  const pattern = declensionPatterns.find((item) => item.id === noun.patternId);
   const nounStats = getModuleStats("nouns", nouns.length);
   const isLearned = nounStats.completedItemIds.includes(String(noun.id));
 
@@ -63,6 +65,16 @@ export default function NounPage() {
         <div className="space-y-3">
           <h2 className="text-xl font-semibold text-slate-950">Відмінювання</h2>
           <NounDeclensionTable noun={noun} />
+          {pattern ? (
+            <p className="text-sm text-slate-600">
+              Зразок відмінювання: <span lang="cs" className="font-semibold">{pattern.example}</span> ({pattern.title.toLowerCase()}).{" "}
+              <Link to={"/nouns/rules/" + pattern.id} className="font-semibold text-blue-700 underline">Правила й закінчення</Link>
+            </p>
+          ) : (
+            <p className="text-sm text-slate-600">
+              <Link to="/nouns/rules" className="font-semibold text-blue-700 underline">Правила відмінювання</Link>
+            </p>
+          )}
         </div>
         <div className="space-y-3">
           <h2 className="text-xl font-semibold text-slate-950">Приклади</h2>

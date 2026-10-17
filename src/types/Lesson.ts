@@ -22,7 +22,7 @@ export interface LessonModule {
   id: string;
   title: string;
   subtitle: string;
-  icon: "copy" | "hash" | "calendar" | "palette" | "route" | "messages";
+  icon: "copy" | "hash" | "calendar" | "palette" | "route" | "messages" | "clock";
   referenceTitle?: string;
   referenceItems?: string[];
   lessons: LessonItem[];

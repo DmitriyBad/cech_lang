@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { BookMarked, Filter } from "lucide-react";
 import { useMemo, useState } from "react";
 import NounCard from "../components/NounCard";
@@ -52,6 +53,15 @@ export default function NounsPage() {
         <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-soft">
           <ProgressBar value={nounStats.learnedPercent} label="Вивчені іменники" />
         </div>
+      </section>
+
+      <section className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-blue-200 bg-blue-50 p-4">
+        <p className="max-w-2xl text-sm text-slate-700">
+          Не знаєте, яке закінчення поставити? Прочитайте правила: що означає кожен відмінок, які бувають зразки й чергування.
+        </p>
+        <Link to="/nouns/rules" className="focus-ring inline-flex min-h-11 items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">
+          Правила відмінювання
+        </Link>
       </section>
 
       <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">

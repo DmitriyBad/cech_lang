@@ -189,7 +189,7 @@ const nounSeeds: NounSeed[] = [
     "gender": "masculine",
     "paradigm": "inanimateHard",
     "stem": "obchod",
-    "locativeSingular": "obchodu",
+    "locativeSingular": "obchodě",
     "nominativePlural": "obchody",
     "level": "A1"
   },
@@ -1421,7 +1421,7 @@ const formOverrides: Record<string, FormOverrides> = {
   // локатив множини на -ích після k/h
   park: { plural: { locative: "parcích" } },
   vlak: { plural: { locative: "vlacích" } },
-  jazyk: { plural: { locative: "jazycích" } },
+  jazyk: { singular: { genitive: "jazyka" }, plural: { locative: "jazycích" } },
   batoh: { plural: { locative: "batozích" } },
   lístek: { plural: { locative: "lístcích" } },
   obrázek: { plural: { locative: "obrázcích" } },
@@ -1460,6 +1460,18 @@ const formOverrides: Record<string, FormOverrides> = {
   moře: { plural: { genitive: "moří" } },
 };
 
+const patternByParadigm: Partial<Record<NounSeed["paradigm"], string>> = {
+  animateHard: "student",
+  animateSoft: "ucitel",
+  inanimateHard: "obchod",
+  inanimateSoft: "pokoj",
+  feminineA: "skola",
+  feminineE: "ulice",
+  neuterO: "mesto",
+  neuterE: "more",
+  neuterI: "nadrazi",
+};
+
 export const nouns: Noun[] = nounSeeds.map((seed, index) => {
   const declined = decline(seed);
   const overrides = formOverrides[seed.noun];
@@ -1475,6 +1487,7 @@ export const nouns: Noun[] = nounSeeds.map((seed, index) => {
     gender: seed.gender,
     level: seed.level,
     animate: forms.animate,
+    patternId: patternByParadigm[seed.paradigm],
     singular: forms.singular,
     plural: forms.plural,
   };

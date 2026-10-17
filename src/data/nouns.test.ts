@@ -115,3 +115,11 @@ describe("verbs", () => {
     }
   });
 });
+
+describe("known exceptions", () => {
+  it("jazyk has genitive jazyka", () => {
+    const jazyk = nouns.find((noun) => noun.noun === "jazyk")!;
+    expect(jazyk.singular.genitive).toBe("jazyka");
+    expect(jazyk.singular.locative).toBe("jazyku");
+  });
+});
