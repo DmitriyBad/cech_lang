@@ -1,4 +1,4 @@
-import { BarChart3, BookMarked, BookOpen, Grid2X2, Home, Save, UserRound } from "lucide-react";
+import { BarChart3, BookMarked, BookOpen, Dumbbell, Grid2X2, Home, Save, UserRound } from "lucide-react";
 import { FormEvent, useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { verbs } from "../data/verbs";
@@ -68,6 +68,10 @@ export default function Header() {
           <NavLink to="/modules" className={navLinkClass}>
             <Grid2X2 size={18} aria-hidden="true" />
             Граматика
+          </NavLink>
+          <NavLink to="/practice" className={navLinkClass}>
+            <Dumbbell size={18} aria-hidden="true" />
+            Тренування
           </NavLink>
           <NavLink to="/statistics" className={navLinkClass}>
             <BarChart3 size={18} aria-hidden="true" />

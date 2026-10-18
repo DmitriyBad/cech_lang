@@ -11,6 +11,7 @@ import NounExercisePage from "./pages/NounExercisePage";
 import NounPage from "./pages/NounPage";
 import NounRulesPage from "./pages/NounRulesPage";
 import NounsPage from "./pages/NounsPage";
+import PracticePage from "./pages/PracticePage";
 import PhrasesPage from "./pages/PhrasesPage";
 import PronunciationPage from "./pages/PronunciationPage";
 import StatisticsPage from "./pages/StatisticsPage";
@@ -36,6 +37,7 @@ export default function App() {
           <Route path="/modules/:moduleId/:lessonId/exercises" element={<ModuleExercisePage />} />
           <Route path="/start/pronunciation" element={<PronunciationPage />} />
           <Route path="/start/phrases" element={<PhrasesPage />} />
+          <Route path="/practice" element={<PracticePage />} />
           <Route path="/statistics" element={<StatisticsPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

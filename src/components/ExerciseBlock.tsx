@@ -10,7 +10,8 @@ const czechLetters = ["á", "č", "ď", "é", "ě", "í", "ň", "ó", "ř", "š"
 interface ExerciseBlockProps {
   exercise: Exercise;
   index: number;
-  onAnswer: (isCorrect: boolean) => void;
+  /** `given` — вибраний чи введений текст (порожній, якщо натиснули «Не знаю»). */
+  onAnswer: (isCorrect: boolean, given?: string) => void;
 }
 
 export default function ExerciseBlock({ exercise, index, onAnswer }: ExerciseBlockProps) {
@@ -83,7 +84,7 @@ export default function ExerciseBlock({ exercise, index, onAnswer }: ExerciseBlo
     }
 
     setSelectedAnswer(answer);
-    onAnswer(answer === exercise.correctAnswer);
+    onAnswer(answer === exercise.correctAnswer, answer);
   };
 
   const submitTyped = (event: FormEvent) => {
@@ -95,13 +96,13 @@ export default function ExerciseBlock({ exercise, index, onAnswer }: ExerciseBlo
 
     const result = matchAnswer(typedDraft, exercise.correctAnswer, exercise.options);
     setTypedResult(result);
-    onAnswer(result !== "wrong");
+    onAnswer(result !== "wrong", typedDraft.trim());
   };
 
   const giveUp = () => {
     if (!isAnswered) {
       setTypedResult("gave-up");
-      onAnswer(false);
+      onAnswer(false, "");
     }
   };
 
