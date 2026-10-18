@@ -123,6 +123,12 @@ const withGender = (masculine: string) => {
   };
 };
 
+/** Текст для озвучення: у 3 особі частка se/si стоїть перед формою («on se učil»), а не після неї. */
+export const speakablePast = (pronoun: string, text: string): string => {
+  const match = /^(.*) (se|si)$/.exec(text);
+  return match && !/^(jsem|jsi|jsme|jste|ses|sis)( |$)/.test(text) ? pronoun + " " + match[2] + " " + match[1] : pronoun + " " + text;
+};
+
 /** Таблиця минулого часу для дієслова. Повертає null, якщо форми немає у словнику. */
 export const buildPastRows = (infinitive: string): PastRow[] | null => {
   const masculine = pastMasculine[infinitive];

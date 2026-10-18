@@ -1,12 +1,12 @@
 import { Link } from "react-router-dom";
-import { buildPastRows } from "../data/verbPast";
+import { buildPastRows, speakablePast } from "../data/verbPast";
 import SpeakButton from "./SpeakButton";
 
 function Form({ pronoun, text }: { pronoun?: string; text: string }) {
   return (
     <span className="flex items-center justify-between gap-2">
       <span lang="cs">{text}</span>
-      <SpeakButton text={(pronoun ? pronoun + " " : "") + text} />
+      <SpeakButton text={pronoun ? speakablePast(pronoun, text) : text} />
     </span>
   );
 }

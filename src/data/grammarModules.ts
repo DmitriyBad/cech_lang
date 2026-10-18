@@ -104,7 +104,7 @@ const numberReferenceItems = [
 
 const moduleReferences: Record<string, { referenceTitle: string; referenceItems: string[] }> = {
   tenses: {
-    referenceTitle: "Минулий час: допоміжне jsem",
+    referenceTitle: "Минулий і майбутній час: допоміжні дієслова",
     referenceItems: [
       "já — jsem dělal / jsem dělala",
       "ty — jsi dělal / jsi dělala",
@@ -112,6 +112,8 @@ const moduleReferences: Record<string, { referenceTitle: string; referenceItems:
       "my — jsme dělali / jsme dělaly",
       "vy — jste dělali / jste dělaly (до однієї людини: jste dělal / jste dělala)",
       "oni / ony — dělali / dělaly (без допоміжного)",
+      "Майбутній час (недоконані): budu / budeš / bude / budeme / budete / budou + інфінітив: budu dělat",
+      "Майбутній час (доконані): проста форма, як у теперішньому: udělám, napíšu, přijdu",
     ],
   },
   numbers: {
@@ -697,8 +699,8 @@ const rawModules = [
   },
   {
     "id": "tenses",
-    "title": "Теперішній і минулий час",
-    "subtitle": "Як змінюється дієслово: що я роблю зараз і що робив учора.",
+    "title": "Теперішній, минулий і майбутній час",
+    "subtitle": "Як змінюється дієслово: що я роблю зараз, що робив учора і що зроблю завтра.",
     "icon": "clock",
     "lessons": [
       ["tenses-present-a", "Теперішній час: dělat, čekat", "dělám, děláš, dělá", "A1", "Більшість дієслів на -at (dělat, čekat, hledat, poslouchat, snídat) змінюються за особами так: já -ám, ty -áš, on/ona/ono -á, my -áme, vy -áte, oni -ají.\nОсобовий займенник (já, ty, my…) зазвичай опускають: Dělám úkol. Він потрібен лише для підкреслення: Já dělám, ale ty ne.\nЧеське теперішнє відповідає і українському «роблю», і «роблю зараз»: окремої форми для тривалості немає.\nУ вправах особу визначайте за українським перекладом.", ["Dělám úkol.", "Co děláš večer?", "Studenti dělají cvičení."]],
@@ -708,7 +710,11 @@ const rawModules = [
       ["tenses-past-gender", "Минулий час: рід і число", "byl, byla, bylo, byli, byly", "A1", "Форма на -l узгоджується з тим, хто діє: чоловічий рід -l (byl), жіночий -la (byla), середній -lo (bylo), множина чоловіків -li (byli); множина жіночого роду й неживих чоловічих іменників -ly (ženy byly, domy byly); множина середнього роду -la (auta byla).\nЧоловік каже: byl jsem, жінка: byla jsem. Якщо серед тих, хто діє, є хоча б один чоловік, вживаємо -li: my jsme byli.\nСлово děti вживається з -ly: děti hrály (не hráli).\nЧемне «vy» до однієї людини: Vy jste byl (до чоловіка), Vy jste byla (до жінки), а до кількох: Vy jste byli.\nУ вправах рід і час визначайте за українським перекладом.", ["Petr byl doma.", "Anna byla v kavárně.", "Auto bylo drahé."]],
       ["tenses-past-irregular", "Минулий час: неправильні форми", "šel, mohl, četl, řekl, jedl", "A2", "У частині дієслів форма на -l не збігається з інфінітивом, і її треба запам'ятати: být → byl, mít → měl, jít → šel (šla, šlo, šli, šly), moci → mohl, číst → četl, říct → řekl, jíst → jedl, vzít → vzal, najít → našel, přinést → přinesl.\nЗакінчення -a, -o, -i, -y додаються так само: šel, šla, šlo, šli, šly.", ["Včera jsem šel domů.", "Měl jsem hlad.", "Řekl jsem to učiteli."]],
       ["tenses-past-neg-refl", "Минулий час: заперечення і se", "nebyl jsem, díval jsem se", "A2", "Заперечення ne- додається до форми на -l: byl → nebyl, šel → nešel, rozuměla → nerozuměla. Допоміжне jsem залишається окремо: Nebyl jsem doma.\nЧастки se та si в минулому часі стоять після jsem/jsi/jsme/jste: Díval jsem se. Vrátil jsem se. У третій особі jsem немає: Petr se bál.\nУ другій особі jsi se часто стягується в ses: ty ses díval (= ty jsi se díval); так само jsi si → sis: ty sis pamatoval.", ["Nebyl jsem doma.", "Díval jsem se na film.", "Petr se bál tmy."]],
-      ["tenses-choose", "Теперішній чи минулий: слова-підказки", "dnes, teď, včera, minulý týden", "A1", "Слова часу підказують, яку форму обрати. Теперішній: teď (зараз), každý den (щодня), obvykle (зазвичай). Слово dnes (сьогодні) може стояти і з минулим (Dnes ráno jsem pracoval), тож дивіться на зміст. Минулий: včera (вчора), minulý týden (минулого тижня), před hodinou (годину тому), loni (торік).\nУ доконаних дієслів «теперішня» форма означає майбутнє: přijdu zítra — прийду завтра (доконані дієслова: přijít, koupit, napsat).", ["Dnes pracuji doma.", "Včera jsem pracoval v kanceláři.", "Teď čekám na autobus."]]
+      ["tenses-future-budu", "Майбутній час: budu + інфінітив", "budu dělat, budeš dělat", "A1", "Недоконані дієслова (dělat, pracovat, čekat, učit se…) утворюють майбутній час так: допоміжне дієслово být у формі майбутнього + інфінітив (виняток: jít → půjdu, jet → pojedu, див. урок про дієслова руху): já budu dělat, ty budeš dělat, on/ona/ono bude dělat, my budeme dělat, vy budete dělat, oni budou dělat.\nІнфінітив не змінюється, змінюється лише budu, budeš, bude, budeme, budete, budou.\nСамо дієслово být у майбутньому стоїть без інфінітива: Zítra budu doma. Příští týden budeme v Praze.\nЗаперечення: ne- додається до budu: nebudu dělat, nebudeš dělat.\nПро заплановане майбутнє часто кажуть і теперішнім часом: Zítra jdu do kina (завтра йду в кіно). Це теж нормально.\nУ вправах особу визначайте за підметом.", ["Zítra budu doma.", "Co budeš dělat o víkendu?", "Budeme studovat češtinu."]],
+      ["tenses-future-perfective", "Майбутній час: доконані дієслова", "napíšu, koupím, udělám", "A2", "Доконані дієслова відповідають на питання «що зробити?» (napsat, koupit, udělat, zavolat, přijít). Теперішнього часу в них немає: форми, які виглядають як теперішній час, означають майбутнє: napíšu = «напишу», koupím = «куплю», přijdu = «прийду».\nЗакінчення ті самі, що в теперішньому часі: udělám, uděláš, udělá, uděláme, uděláte, udělají.\nНе можна казати budu napsat чи budu udělat: правильно napíšu, udělám.\nЧасто недоконане й доконане дієслова утворюють пару: dělat — udělat, psát — napsat, kupovat — koupit, volat — zavolat, číst — přečíst, vidět — uvidět.\nBudu psát підкреслює процес («буду писати»), napíšu — результат («напишу, закінчу»).", ["Zítra to udělám.", "Napíšu ti večer.", "Kdy přijdeš domů?"]],
+      ["tenses-future-motion", "Майбутній час: půjdu, pojedu", "půjdu, pojedu", "A2", "Дієслова руху jít та jet у майбутньому мають особливі форми з префіксом (pů-, po-), тому budu їм не потрібне: jít → půjdu, půjdeš, půjde, půjdeme, půjdete, půjdou; jet → pojedu, pojedeš, pojede, pojedeme, pojedete, pojedou. Форми budu jít, budu jet для однієї конкретної дії не вживаємо: кажемо půjdu, pojedu.\nЗаперечення: nepůjdu, nepojedu.\nДля повторюваних дій вживаємо budu chodit (буду ходити): Budu chodit do školy každý den.", ["Zítra půjdu do školy.", "Pojedeme vlakem.", "Nepůjdu do práce."]],
+      ["tenses-future-neg-refl", "Майбутній час: заперечення і se", "nebudu dělat, budu se učit", "A2", "Заперечення: ne- + форма budu: nebudu, nebudeš, nebude, nebudeme, nebudete, nebudou: nebudu pracovat, nebudeme čekat. У доконаних дієслів ne- додається до самої форми: nenapíšu, nepřijdu.\nЧастки se та si стоять на другому місці в реченні. Якщо речення починається з budu, частка йде одразу після нього: Budu se učit česky, Nebudu se bát. Якщо перед budu є підмет чи обставина, частка стоїть перед budu: Já se budu učit, Zítra se budu učit, Petr se nebude bát. У доконаних так само: Já se vrátím, My se uvidíme, але Vrátím se (дієслово на початку).\nЧастки se та si не можуть стояти на першому місці: Budu se učit česky, але не Se budu učit.", ["Nebudu pracovat.", "Budu se učit česky.", "Uvidíme se zítra."]],
+      ["tenses-choose", "Який час: слова-підказки", "dnes, včera, zítra", "A1", "Слова часу підказують, яку форму обрати. Теперішній: teď (зараз), každý den (щодня), obvykle (зазвичай). Минулий: včera (вчора), minulý týden (минулого тижня), před hodinou (годину тому), loni (торік). Майбутній: zítra (завтра), pozítří (післязавтра), příští týden (наступного тижня), za hodinu (через годину), brzy (незабаром).\nСлово dnes (сьогодні) може стояти з будь-яким часом (Dnes pracuji, Dnes ráno jsem pracoval, Dnes večer budu doma), тож дивіться на зміст.\nУ майбутньому більшість недоконаних дієслів мають budu + інфінітив (zítra budu psát), доконані мають просту форму (zítra napíšu). Заплановане майбутнє можна виражати й теперішнім часом: Příští týden jedeme do Prahy.", ["Dnes pracuji doma.", "Včera jsem pracoval v kanceláři.", "Zítra budu pracovat doma."]]
     ]
   }
 ];
