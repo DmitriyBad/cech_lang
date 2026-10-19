@@ -1,6 +1,6 @@
 import { BarChart3, BookMarked, BookOpen, Dumbbell, Grid2X2, Home, Save, UserRound } from "lucide-react";
 import { FormEvent, useEffect, useState } from "react";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { verbs } from "../data/verbs";
 import { useProgress } from "../hooks/useProgress";
 
@@ -25,7 +25,7 @@ export default function Header() {
 
   return (
     <header className="border-b border-slate-200 bg-white">
-      <div className="mx-auto grid w-full max-w-7xl gap-3 px-4 py-3 sm:px-6 xl:grid-cols-[auto_minmax(260px,390px)_auto] xl:items-center xl:px-8">
+      <div className="relative mx-auto grid w-full max-w-7xl gap-3 px-4 py-3 sm:px-6 xl:grid-cols-[auto_minmax(260px,390px)_auto] xl:items-center xl:px-8">
         <NavLink to="/" className="focus-ring flex w-fit items-center gap-3 rounded-md">
           <span className="grid h-10 w-10 place-items-center rounded-md bg-blue-600 text-white">
             <BookOpen size={22} aria-hidden="true" />
@@ -36,7 +36,16 @@ export default function Header() {
           </span>
         </NavLink>
 
-        <form onSubmit={handleSubmit} className="flex min-w-0 gap-2 rounded-lg border border-slate-200 bg-slate-50 p-1.5">
+        <Link
+          to="/profile"
+          className="focus-ring absolute right-4 top-3 inline-flex min-h-10 max-w-[45%] items-center gap-2 rounded-md border border-slate-200 bg-slate-50 px-3 text-sm font-medium text-slate-700 md:hidden"
+          aria-label={activeNickname ? "Профіль: " + activeNickname : "Профіль"}
+        >
+          <UserRound size={18} aria-hidden="true" />
+          <span className="truncate">{activeNickname || "Профіль"}</span>
+        </Link>
+
+        <form onSubmit={handleSubmit} className="hidden min-w-0 gap-2 md:flex rounded-lg border border-slate-200 bg-slate-50 p-1.5">
           <label className="relative min-w-0 flex-1">
             <span className="sr-only">Нікнейм</span>
             <UserRound className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} aria-hidden="true" />

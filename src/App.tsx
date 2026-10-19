@@ -15,6 +15,7 @@ import NounExercisePage from "./pages/NounExercisePage";
 import NounPage from "./pages/NounPage";
 import NounRulesPage from "./pages/NounRulesPage";
 import NounsPage from "./pages/NounsPage";
+import ProfilePage from "./pages/ProfilePage";
 import PracticePage from "./pages/PracticePage";
 import PhrasesPage from "./pages/PhrasesPage";
 import PronunciationPage from "./pages/PronunciationPage";
@@ -35,6 +36,7 @@ export default function App() {
       <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col px-4 py-5 pb-24 sm:px-6 md:pb-5 lg:px-8">
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/profile" element={<ProfilePage />} />
           <Route path="/learn" element={<LearnPage />} />
           <Route path="/verbs" element={<VerbsPage />} />
           <Route path="/verbs/:verbId" element={<VerbPage />} />
