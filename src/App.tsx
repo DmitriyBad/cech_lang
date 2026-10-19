@@ -21,13 +21,23 @@ import PhrasesPage from "./pages/PhrasesPage";
 import PronunciationPage from "./pages/PronunciationPage";
 import StatisticsPage from "./pages/StatisticsPage";
 import VerbPage from "./pages/VerbPage";
+import ConsentBanner from "./components/ConsentBanner";
+import AdminPage from "./pages/AdminPage";
+import PrivacyPage from "./pages/PrivacyPage";
+import { track } from "./lib/analytics";
+import { startSync } from "./lib/sync";
 import { saveLastVisit } from "./utils/lastVisit";
 
 export default function App() {
   const { pathname } = useLocation();
 
   useEffect(() => {
+    startSync();
+  }, []);
+
+  useEffect(() => {
     saveLastVisit(pathname);
+    track("pageview", pathname);
   }, [pathname]);
 
   return (
@@ -36,6 +46,8 @@ export default function App() {
       <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col px-4 py-5 pb-24 sm:px-6 md:pb-5 lg:px-8">
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
+          <Route path="/admin" element={<AdminPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/learn" element={<LearnPage />} />
           <Route path="/verbs" element={<VerbsPage />} />
@@ -58,6 +70,7 @@ export default function App() {
         </Routes>
       </main>
       <Footer />
+      <ConsentBanner />
       <BottomNav />
     </div>
   );

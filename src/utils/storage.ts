@@ -75,7 +75,7 @@ const normalizeModuleProgress = (value: Partial<ModuleProgress> | null | undefin
       : {},
 });
 
-const normalizeProgress = (value: Partial<StoredProgress> | null | undefined): StoredProgress => ({
+export const normalizeProgress = (value: Partial<StoredProgress> | null | undefined): StoredProgress => ({
   learnedVerbIds: Array.isArray(value?.learnedVerbIds) ? value.learnedVerbIds : [],
   correctAnswers: Number.isFinite(value?.correctAnswers) ? Number(value?.correctAnswers) : 0,
   wrongAnswers: Number.isFinite(value?.wrongAnswers) ? Number(value?.wrongAnswers) : 0,
@@ -206,6 +206,74 @@ export const adoptGuestProgress = (nickname: string): boolean => {
   const { [GUEST_PROFILE_KEY]: _guest, ...rest } = store;
   saveProgressStore({ ...rest, [key]: guest });
   return true;
+};
+
+const maxRecord = <K extends string>(a: Record<K, number>, b: Record<K, number>): Record<K, number> => {
+  const result = { ...a };
+  for (const key of Object.keys(b) as K[]) {
+    result[key] = Math.max(result[key] ?? 0, b[key]);
+  }
+  return result;
+};
+
+/**
+ * Зливає прогрес із двох пристроїв (або гостя й акаунта) без втрати даних:
+ * вивчені слова об'єднуються, лічильники беруться більші, для кожної картки повторення береться свіжіша.
+ * Лічильники відповідей наближені: точно скласти їх неможливо, бо історія не зберігається.
+ */
+export const mergeProgress = (a: StoredProgress, b: StoredProgress): StoredProgress => {
+  const moduleIds = new Set([...Object.keys(a.moduleProgress), ...Object.keys(b.moduleProgress)]);
+  const moduleProgress: Record<string, ModuleProgress> = {};
+
+  for (const id of moduleIds) {
+    const left = a.moduleProgress[id] ?? emptyModuleProgress;
+    const right = b.moduleProgress[id] ?? emptyModuleProgress;
+    moduleProgress[id] = {
+      completedItemIds: Array.from(new Set([...left.completedItemIds, ...right.completedItemIds])),
+      correctAnswers: Math.max(left.correctAnswers, right.correctAnswers),
+      wrongAnswers: Math.max(left.wrongAnswers, right.wrongAnswers),
+      mistakesByItemId: maxRecord(left.mistakesByItemId, right.mistakesByItemId),
+    };
+  }
+
+  const srs: Record<string, SrsCard> = { ...a.srs };
+  for (const [key, card] of Object.entries(b.srs)) {
+    const existing = srs[key];
+    srs[key] = !existing || card.lastDay > existing.lastDay ? card : existing;
+  }
+
+  return {
+    learnedVerbIds: Array.from(new Set([...a.learnedVerbIds, ...b.learnedVerbIds])),
+    correctAnswers: Math.max(a.correctAnswers, b.correctAnswers),
+    wrongAnswers: Math.max(a.wrongAnswers, b.wrongAnswers),
+    mistakesByVerbId: maxRecord(a.mistakesByVerbId, b.mistakesByVerbId),
+    moduleProgress,
+    srs,
+  };
+};
+
+export const progressHasActivity = hasActivity;
+
+/** Перейменовує профіль: прогрес переходить під нове ім'я (зливається, якщо таке вже є). */
+export const renameProfile = (from: string, to: string): string => {
+  const fromKey = profileKey(from);
+  const toNickname = isReservedNickname(to) ? "" : normalizeNickname(to);
+  const toKey = profileKey(toNickname);
+
+  if (fromKey === toKey) {
+    return saveActiveNickname(toNickname);
+  }
+
+  const store = loadProgressStore();
+  const moving = store[fromKey];
+  const { [fromKey]: _removed, ...rest } = store;
+
+  if (moving) {
+    rest[toKey] = rest[toKey] ? mergeProgress(rest[toKey], moving) : moving;
+  }
+
+  saveProgressStore(rest);
+  return saveActiveNickname(toNickname);
 };
 
 export const subscribeToProgress = (listener: () => void) => {

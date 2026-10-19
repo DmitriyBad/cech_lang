@@ -10,6 +10,7 @@ import {
   saveProgress,
   subscribeToProgress,
 } from "../utils/storage";
+import { track } from "../lib/analytics";
 import { reviewCard, todayNumber } from "../utils/srs";
 
 // Правильна відповідь зменшує лічильник помилок, щоб вивчене слово виходило зі списку повторення.
@@ -95,6 +96,7 @@ export function useProgress(totalVerbs = 0) {
             },
         srs: updateSrs(current.srs, "v:" + verbId, isCorrect),
       }));
+      track("answer", undefined, { correct: isCorrect, key: "v:" + verbId });
     },
     [updateProgress],
   );
@@ -130,6 +132,7 @@ export function useProgress(totalVerbs = 0) {
 
   const registerModuleAnswer = useCallback(
     (moduleId: string, itemId: string, isCorrect: boolean) => {
+      track("answer", undefined, { correct: isCorrect, key: (moduleId === "nouns" ? "n:" : "l:") + itemId });
       updateProgress((current) => {
         const currentModule = current.moduleProgress[moduleId] ?? {
           completedItemIds: [],
