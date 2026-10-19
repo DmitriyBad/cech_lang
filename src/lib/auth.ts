@@ -76,6 +76,16 @@ export const signInWithEmail = async (email: string): Promise<string | null> => 
   return error ? error.message : null;
 };
 
+/** Вхід через Google: браузер переходить на сторінку Google і повертається на сайт із ?code=… (PKCE). */
+export const signInWithGoogle = async (): Promise<string | null> => {
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: { redirectTo: window.location.origin + window.location.pathname },
+  });
+
+  return error ? error.message : null;
+};
+
 export const signOut = async () => {
   await supabase.auth.signOut();
 };
