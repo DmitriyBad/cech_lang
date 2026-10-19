@@ -1,5 +1,6 @@
 import type { Example, Exercise } from "../types/Verb";
 import type { CzechCaseKey, Noun, NounCaseForms } from "../types/Noun";
+import { explainNounExercise } from "./explanations";
 import { nounExamplesA } from "./nounExamplesA";
 import { nounExamplesB } from "./nounExamplesB";
 import { nounExamplesC } from "./nounExamplesC";
@@ -1313,8 +1314,12 @@ const buildExamples = (noun: Pick<Noun, "noun" | "translation" | "singular" | "p
 const pluralRareNouns = new Set(["ovoce", "nádobí", "zboží", "učení", "bydlení", "oblečení"]);
 const pluralExercisePattern = /множини|однина-множина|Tady jsou|Pracuju s/;
 
-const buildExercises = (noun: Pick<Noun, "noun" | "translation" | "singular" | "plural">, pluralRare = false): Exercise[] =>
-  buildAllExercises(noun).filter(
+type ExerciseNoun = Pick<Noun, "noun" | "translation" | "singular" | "plural"> & Partial<Pick<Noun, "gender" | "animate" | "patternId">>;
+
+const buildExercises = (noun: ExerciseNoun, pluralRare = false): Exercise[] =>
+  buildAllExercises(noun)
+    .map((exercise) => ({ ...exercise, explanation: explainNounExercise(exercise.question, noun) }))
+    .filter(
     (exercise) =>
       new Set(exercise.options).size >= 2 &&
       exercise.options.includes(exercise.correctAnswer) &&

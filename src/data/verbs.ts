@@ -29,6 +29,17 @@ const buildExamples = (verb: VerbSeed): Example[] => [...verb.examples, ...(extr
 const buildExercises = (verb: VerbSeed, allVerbs: VerbSeed[]): Exercise[] => {
   const exerciseExamples = verb.examples.slice(0, 3);
   const allForms = personPrompts.map(({ key }) => verb.conjugation[key]);
+  const formsRow = personPrompts.map(({ label, key }) => label + " " + verb.conjugation[key]).join(", ");
+  const aspectNote = perfectiveInfinitives.has(verb.infinitive) ? ["Це доконане дієслово: ці форми означають майбутній час."] : [];
+  const infinitiveNote = "«" + verb.infinitive + "» — інфінітив (словникова форма): " + verb.translation + ".";
+  const firstExample = verb.examples[0];
+
+  // У якій формі дієслово стоїть у реченні (за таблицею відмінювання).
+  const findFormNote = (sentence: string): string[] => {
+    const padded = " " + sentence.toLowerCase().replace(/[.,!?“”"]/g, "") + " ";
+    const found = personPrompts.find(({ key }) => padded.includes(" " + verb.conjugation[key].toLowerCase() + " "));
+    return found ? ["У реченні дієслово " + verb.infinitive + " стоїть у формі «" + verb.conjugation[found.key] + "» (" + found.label + ")."] : [];
+  };
 
   const conjugationExercises = personPrompts.map(({ label, key }) => {
     const correctAnswer = verb.conjugation[key];
@@ -37,6 +48,7 @@ const buildExercises = (verb: VerbSeed, allVerbs: VerbSeed[]): Exercise[] => {
       question: "Доповніть форму для “" + label + "”: " + verb.infinitive,
       options: createOptions(correctAnswer, allForms.filter((form) => form !== correctAnswer)),
       correctAnswer,
+      explanation: ["Дієслово " + verb.infinitive + " (" + verb.translation + ") змінюється за особами: " + formsRow + ".", ...aspectNote],
     };
   });
 
@@ -47,6 +59,7 @@ const buildExercises = (verb: VerbSeed, allVerbs: VerbSeed[]): Exercise[] => {
       exerciseExamples.map((candidate) => candidate.ua).filter((translation) => translation !== example.ua),
     ),
     correctAnswer: example.ua,
+    explanation: [...findFormNote(example.cz), "Переклад: " + example.ua],
   }));
 
   const reverseTranslationExercises = exerciseExamples.map((example) => ({
@@ -56,6 +69,7 @@ const buildExercises = (verb: VerbSeed, allVerbs: VerbSeed[]): Exercise[] => {
       exerciseExamples.map((candidate) => candidate.cz).filter((sentence) => sentence !== example.cz),
     ),
     correctAnswer: example.cz,
+    explanation: [...findFormNote(example.cz), "Це речення з дієсловом " + verb.infinitive + " (" + verb.translation + ")."],
   }));
 
   const meaningExercises = [
@@ -69,6 +83,7 @@ const buildExercises = (verb: VerbSeed, allVerbs: VerbSeed[]): Exercise[] => {
         ),
       ),
       correctAnswer: verb.translation,
+      explanation: [infinitiveNote, "Приклад: " + firstExample.cz + " — " + firstExample.ua],
     },
     {
       question: "Оберіть чеський інфінітив для: “" + verb.translation + "”",
@@ -80,6 +95,7 @@ const buildExercises = (verb: VerbSeed, allVerbs: VerbSeed[]): Exercise[] => {
         ),
       ),
       correctAnswer: verb.infinitive,
+      explanation: [infinitiveNote, "Приклад: " + firstExample.cz + " — " + firstExample.ua],
     },
     {
       question: "Оберіть правильну пару особа + форма для “" + verb.infinitive + "”",
@@ -88,6 +104,7 @@ const buildExercises = (verb: VerbSeed, allVerbs: VerbSeed[]): Exercise[] => {
         "já — " + verb.conjugation.ty,
       ]),
       correctAnswer: "já — " + verb.conjugation.ja,
+      explanation: ["Форми дієслова " + verb.infinitive + ": " + formsRow + ".", "Закінчення залежить від особи: «já» і «ty» мають різні форми."],
     },
   ];
 

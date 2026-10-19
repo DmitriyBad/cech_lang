@@ -1,12 +1,13 @@
 import { ArrowRight, Dumbbell, RotateCcw } from "lucide-react";
-import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import AnswerModeToggle from "../components/AnswerModeToggle";
 import ExerciseBlock from "../components/ExerciseBlock";
 import ProgressBar from "../components/ProgressBar";
 import {
   createSession,
   currentIndex,
+  dueSources,
   getPracticeItem,
   isFinished,
   mistakeSources,
@@ -18,6 +19,7 @@ import {
   type PracticeTopic,
 } from "../data/practice";
 import { useProgress } from "../hooks/useProgress";
+import { cardLevel } from "../utils/srs";
 import { loadPracticeSession, savePracticeSession } from "../utils/practiceStorage";
 
 const SESSION_SIZE = 10;
@@ -32,7 +34,15 @@ export default function PracticePage() {
     return isFinished(saved) ? saved.items.length : currentIndex(saved);
   });
 
+  const [searchParams, setSearchParams] = useSearchParams();
   const mistakeCount = useMemo(() => mistakeSources(progress).length, [progress]);
+  const dueCount = useMemo(() => dueSources(progress).length, [progress]);
+  const levels = useMemo(() => {
+    const result = { learning: 0, known: 0, strong: 0 };
+    for (const card of Object.values(progress.srs)) result[cardLevel(card)] += 1;
+    return result;
+  }, [progress.srs]);
+  const cardTotal = Object.keys(progress.srs).length;
 
   const update = (next: PracticeSession | null, index = 0) => {
     setSession(next);
@@ -46,6 +56,18 @@ export default function PracticePage() {
       update(createSession(topic, items));
     }
   };
+
+  // Посилання з головної (?start=due) одразу запускає сесію, якщо немає незавершеної.
+  const startParam = searchParams.get("start");
+  useEffect(() => {
+    if (!startParam) return;
+    const topic = practiceTopics.find((item) => item.id === startParam)?.id;
+    if (topic && !loadPracticeSession()) {
+      start(topic);
+    }
+    setSearchParams({}, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [startParam]);
 
   const handleAnswer = (isCorrect: boolean, given = "") => {
     // Відповідь на вже закриту вправу не рахуємо вдруге.
@@ -81,7 +103,7 @@ export default function PracticePage() {
 
         <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3" aria-label="Теми тренування">
           {practiceTopics.map((topic) => {
-            const disabled = topic.id === "mistakes" && mistakeCount === 0;
+            const disabled = (topic.id === "mistakes" && mistakeCount === 0) || (topic.id === "due" && dueCount === 0);
             return (
               <button
                 key={topic.id}
@@ -92,8 +114,17 @@ export default function PracticePage() {
               >
                 <span className="text-lg font-bold text-slate-950">{topic.title}</span>
                 <span className="text-sm text-slate-600">
-                  {disabled ? "Поки що помилок немає: тренуйтеся, і вони з'являться тут" : topic.text}
+                  {disabled && topic.id === "mistakes"
+                    ? "Поки що помилок немає: тренуйтеся, і вони з'являться тут"
+                    : disabled
+                      ? cardTotal === 0
+                        ? "З'явиться після перших вправ"
+                        : "На сьогодні все повторено. Наступні картки з'являться за графіком"
+                      : topic.text}
                 </span>
+                {topic.id === "due" && dueCount > 0 ? (
+                  <span className="mt-1 text-xs font-semibold text-blue-700">Карток на сьогодні: {dueCount}</span>
+                ) : null}
                 {topic.id === "mistakes" && mistakeCount > 0 ? (
                   <span className="mt-1 text-xs font-semibold text-blue-700">Слів і уроків із помилками: {mistakeCount}</span>
                 ) : null}
@@ -101,6 +132,17 @@ export default function PracticePage() {
             );
           })}
         </section>
+
+        {cardTotal > 0 ? (
+          <p className="text-sm text-slate-600">
+            У повторенні {cardTotal} карток (слів і уроків): вчу {levels.learning}, знаю {levels.known}, міцно {levels.strong}. Що краще ви
+            відповідаєте, то рідше картка повертається: через 1 день, 3 дні, потім усе довше.
+          </p>
+        ) : (
+          <p className="text-sm text-slate-600">
+            Після перших вправ слова й уроки потрапляють у графік повторення: через 1 день, 3 дні, потім усе довше. Помилка повертає картку на сьогодні.
+          </p>
+        )}
       </div>
     );
   }

@@ -7,6 +7,8 @@ export interface Exercise {
   question: string;
   options: string[];
   correctAnswer: string;
+  /** Коротке пояснення, яке показується після відповіді. */
+  explanation?: string[];
 }
 
 export interface Verb {

@@ -1,4 +1,5 @@
 import type { LessonItem, LessonModule, LessonSentence } from "../types/Lesson";
+import { firstParagraph } from "./explanations";
 import { lessonSentences } from "./lessonSentences";
 
 const czechUi = {
@@ -6,7 +7,7 @@ const czechUi = {
 };
 
 // Тримаємо порядок «правильна відповідь першою»: ExerciseBlock сам перемішує варіанти.
-const buildClozeExercises = (title: string, sentences: LessonSentence[]) =>
+const buildClozeExercises = (title: string, sentences: LessonSentence[], rule: string) =>
   sentences.map((sentence) => ({
     question:
       "UA: Оберіть правильну форму для теми “" +
@@ -19,10 +20,11 @@ const buildClozeExercises = (title: string, sentences: LessonSentence[]) =>
       sentence.cz.replace(sentence.focus, "___"),
     options: [sentence.focus, ...sentence.wrong],
     correctAnswer: sentence.focus,
+    explanation: ["Правило: " + rule, "Повне речення: " + sentence.cz + " — " + sentence.ua],
   }));
 
 // Обираємо переклад речення; відволікачі — переклади інших речень цього ж уроку.
-const buildTranslationExercises = (sentences: LessonSentence[]) =>
+const buildTranslationExercises = (sentences: LessonSentence[], title: string, rule: string) =>
   sentences.map((sentence, index) => {
     const distractors = [1, 2]
       .map((offset) => sentences[(index + offset * 3) % sentences.length].ua)
@@ -32,6 +34,7 @@ const buildTranslationExercises = (sentences: LessonSentence[]) =>
       question: "Що означає: “" + sentence.cz + "”",
       options: [sentence.ua, ...distractors].slice(0, 3),
       correctAnswer: sentence.ua,
+      explanation: ["Тема уроку «" + title + "». Правило: " + rule, "Ключова форма в реченні: " + sentence.focus + "."],
     };
   });
 
@@ -175,7 +178,7 @@ const buildLesson = (
     explanation,
     studyItems: buildStudyItems(id, seedExamples),
     examples: sentences.map(({ cz, ua }) => ({ cz, ua })),
-    exercises: [...buildClozeExercises(title, sentences), ...buildTranslationExercises(sentences)],
+    exercises: [...buildClozeExercises(title, sentences, firstParagraph(explanation)), ...buildTranslationExercises(sentences, title, firstParagraph(explanation))],
   };
 };
 

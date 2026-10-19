@@ -245,6 +245,15 @@ export default function ExerciseBlock({ exercise, index, onAnswer }: ExerciseBlo
             </div>
           ) : null}
 
+          {isAnswered && exercise.explanation && exercise.explanation.length > 0 ? (
+            <div className="mt-3 space-y-1 rounded-md border border-blue-100 bg-blue-50 px-3 py-2 text-sm text-slate-800">
+              <p className="font-semibold text-blue-800">Пояснення</p>
+              {exercise.explanation.map((line) => (
+                <p key={line}>{line}</p>
+              ))}
+            </div>
+          ) : null}
+
           {/* Після відповіді можна почути правильну чеську відповідь повністю (слово, форму чи речення). */}
           {isAnswered && listenText ? (
             <div className="mt-3 flex items-center gap-2 rounded-md bg-slate-50 px-3 py-2 text-base font-semibold text-slate-950">

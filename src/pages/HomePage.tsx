@@ -1,9 +1,11 @@
-import { BookOpen, Filter, RotateCcw, Trophy } from "lucide-react";
+import { BookOpen, Dumbbell, Filter, RotateCcw, Trophy } from "lucide-react";
+import { Link } from "react-router-dom";
 import { useMemo, useState } from "react";
 import ProgressBar from "../components/ProgressBar";
 import StartGuide from "../components/StartGuide";
 import SearchBar from "../components/SearchBar";
 import VerbCard from "../components/VerbCard";
+import { dueSources } from "../data/practice";
 import { verbs } from "../data/verbs";
 import { useProgress } from "../hooks/useProgress";
 import type { VerbLevel } from "../types/Verb";
@@ -36,6 +38,7 @@ export default function HomePage() {
   }, [levelFilter, query]);
 
   const isFreshVisitor = learnedCount === 0 && progress.correctAnswers + progress.wrongAnswers === 0;
+  const dueCount = useMemo(() => dueSources(progress).length, [progress]);
   const reviewVerbs = verbs.filter((verb) => reviewVerbIds.includes(verb.id));
 
   return (
@@ -59,6 +62,21 @@ export default function HomePage() {
       </section>
 
       <StartGuide />
+
+      {dueCount > 0 ? (
+        <section className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-emerald-200 bg-emerald-50 p-4" aria-label="Повторення на сьогодні">
+          <div>
+            <h2 className="flex items-center gap-2 text-lg font-bold text-slate-950">
+              <Dumbbell size={20} className="text-emerald-700" aria-hidden="true" />
+              Сьогодні повторити: {dueCount}
+            </h2>
+            <p className="text-sm text-slate-700">Слова й уроки, які пора освіжити за графіком повторення.</p>
+          </div>
+          <Link to="/practice?start=due" className="focus-ring inline-flex min-h-11 items-center rounded-md bg-emerald-700 px-4 text-sm font-semibold text-white hover:bg-emerald-800">
+            Почати повторення
+          </Link>
+        </section>
+      ) : null}
 
       {isFreshVisitor ? null : (
       <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">

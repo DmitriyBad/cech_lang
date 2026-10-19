@@ -1,3 +1,5 @@
+import { normalizeCard, type SrsCard } from "./srs";
+
 export interface ModuleProgress {
   completedItemIds: string[];
   correctAnswers: number;
@@ -11,6 +13,8 @@ export interface StoredProgress {
   wrongAnswers: number;
   mistakesByVerbId: Record<number, number>;
   moduleProgress: Record<string, ModuleProgress>;
+  /** Інтервальне повторення: ключ «v:12» (дієслово), «n:5» (іменник), «l:plural-masc-animate» (урок). */
+  srs: Record<string, SrsCard>;
 }
 
 type ProgressByNickname = Record<string, StoredProgress>;
@@ -32,6 +36,7 @@ export const emptyProgress: StoredProgress = {
   wrongAnswers: 0,
   mistakesByVerbId: {},
   moduleProgress: {},
+  srs: {},
 };
 
 const hasStorage = () => {
@@ -85,6 +90,14 @@ const normalizeProgress = (value: Partial<StoredProgress> | null | undefined): S
             moduleId,
             normalizeModuleProgress(progress),
           ]),
+        )
+      : {},
+  srs:
+    value?.srs && typeof value.srs === "object"
+      ? Object.fromEntries(
+          Object.entries(value.srs)
+            .map(([key, card]) => [key, normalizeCard(card)] as const)
+            .filter((entry): entry is readonly [string, SrsCard] => entry[1] !== null),
         )
       : {},
 });

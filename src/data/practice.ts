@@ -1,12 +1,14 @@
 import type { StoredProgress } from "../utils/storage";
 import type { Exercise } from "../types/Verb";
+import { isDue, todayNumber } from "../utils/srs";
 import { grammarModules } from "./grammarModules";
 import { nouns } from "./nouns";
 import { verbs } from "./verbs";
 
-export type PracticeTopic = "verbs" | "nouns" | "grammar" | "all" | "mistakes";
+export type PracticeTopic = "due" | "verbs" | "nouns" | "grammar" | "all" | "mistakes";
 
 export const practiceTopics: Array<{ id: PracticeTopic; title: string; text: string }> = [
+  { id: "due", title: "Сьогодні повторити", text: "Слова й уроки, які пора повторити за графіком" },
   { id: "all", title: "Усе разом", text: "Мікс дієслів, іменників і граматики" },
   { id: "verbs", title: "Дієслова", text: "Форми, переклад, речення" },
   { id: "nouns", title: "Іменники", text: "Відмінки й закінчення" },
@@ -114,8 +116,33 @@ export const mistakeSources = (progress: StoredProgress): Source[] => {
   return result;
 };
 
+/** Картки інтервального повторення, строк яких настав; найпростроченіші першими. */
+export const dueSources = (progress: StoredProgress, today: number = todayNumber()): Source[] =>
+  Object.entries(progress.srs)
+    .filter(([, card]) => isDue(card, today))
+    .sort((a, b) => a[1].due - b[1].due)
+    .flatMap(([key]): Source[] => {
+      const [code, ...rest] = key.split(":");
+      const id = rest.join(":");
+
+      if (code === "v") {
+        const verb = verbs.find((item) => String(item.id) === id);
+        return verb ? [{ kind: "verb", key: id, count: verb.exercises.length }] : [];
+      }
+
+      if (code === "n") {
+        const noun = nouns.find((item) => String(item.id) === id);
+        return noun ? [{ kind: "noun", key: id, count: noun.exercises.length }] : [];
+      }
+
+      const lesson = lessonById.get(id);
+      return lesson ? [{ kind: "lesson", key: id, count: lesson.exercises.length }] : [];
+    });
+
 export const sourcesForTopic = (topic: PracticeTopic, progress: StoredProgress): Source[][] => {
   switch (topic) {
+    case "due":
+      return [dueSources(progress)];
     case "verbs":
       return [verbSources];
     case "nouns":
@@ -145,7 +172,8 @@ const shuffle = <T,>(values: T[], rng: () => number): T[] => {
  * слово чи урок повторюється, лише коли джерел менше, ніж потрібно вправ.
  */
 export const pickSessionItems = (topic: PracticeTopic, progress: StoredProgress, size = 10, rng: () => number = Math.random): string[] => {
-  const groups = sourcesForTopic(topic, progress).map((group) => shuffle(group, rng));
+  // Для «Сьогодні повторити» зберігаємо порядок: найпростроченіші картки першими.
+  const groups = sourcesForTopic(topic, progress).map((group) => (topic === "due" ? group : shuffle(group, rng)));
   const total = groups.reduce((sum, group) => sum + group.reduce((s, source) => s + source.count, 0), 0);
   const target = Math.min(size, total);
   const used = new Set<string>();

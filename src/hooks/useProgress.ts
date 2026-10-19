@@ -10,6 +10,7 @@ import {
   saveProgress,
   subscribeToProgress,
 } from "../utils/storage";
+import { reviewCard, todayNumber } from "../utils/srs";
 
 // Правильна відповідь зменшує лічильник помилок, щоб вивчене слово виходило зі списку повторення.
 function decrementMistake<K extends string | number>(mistakes: Record<K, number>, key: K): Record<K, number> {
@@ -29,6 +30,11 @@ function decrementMistake<K extends string | number>(mistakes: Record<K, number>
 
   return next;
 }
+
+const updateSrs = (srs: StoredProgress["srs"], key: string, isCorrect: boolean): StoredProgress["srs"] => ({
+  ...srs,
+  [key]: reviewCard(srs[key], isCorrect, todayNumber()),
+});
 
 export function useProgress(totalVerbs = 0) {
   const [activeNickname, setActiveNickname] = useState(() => loadActiveNickname());
@@ -87,6 +93,7 @@ export function useProgress(totalVerbs = 0) {
               ...current.mistakesByVerbId,
               [verbId]: (current.mistakesByVerbId[verbId] ?? 0) + 1,
             },
+        srs: updateSrs(current.srs, "v:" + verbId, isCorrect),
       }));
     },
     [updateProgress],
@@ -135,6 +142,7 @@ export function useProgress(totalVerbs = 0) {
           ...current,
           correctAnswers: current.correctAnswers + (isCorrect ? 1 : 0),
           wrongAnswers: current.wrongAnswers + (isCorrect ? 0 : 1),
+          srs: updateSrs(current.srs, (moduleId === "nouns" ? "n:" : "l:") + itemId, isCorrect),
           moduleProgress: {
             ...current.moduleProgress,
             [moduleId]: {

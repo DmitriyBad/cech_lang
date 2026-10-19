@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { emptyProgress } from "../utils/storage";
 import {
   createSession,
+  dueSources,
   currentIndex,
   getPracticeItem,
   isFinished,
@@ -74,5 +75,23 @@ describe("practice session", () => {
     expect(sanitizeSession({ ...session, answers: [null] })).toBeNull();
     expect(sanitizeSession({ ...session, topic: "x" })).toBeNull();
     expect(sanitizeSession(null)).toBeNull();
+  });
+});
+
+describe("spaced repetition topic", () => {
+  const card = (due: number) => ({ reps: 1, interval: 1, ease: 2.5, due, lastDay: due - 1, lapses: 0 });
+
+  it("lists only due cards, most overdue first, skipping unknown ones", () => {
+    const progress = { ...emptyProgress, srs: { "v:3": card(10), "n:5": card(5), "l:plural-masc-animate": card(99), "v:99999": card(1), "x:1": card(1) } };
+    expect(dueSources(progress, 10).map((s) => s.kind + ":" + s.key)).toEqual(["noun:5", "verb:3"]);
+    expect(dueSources(progress, 100).map((s) => s.kind + ":" + s.key)).toEqual(["noun:5", "verb:3", "lesson:plural-masc-animate"]);
+    expect(dueSources(emptyProgress, 10)).toEqual([]);
+  });
+
+  it("picks session items only from due cards in order", () => {
+    const progress = { ...emptyProgress, srs: { "v:3": card(1), "n:5": card(2) } };
+    const ids = pickSessionItems("due", progress, 2, seeded(4));
+    expect(ids).toHaveLength(2);
+    expect(ids.map((id) => id.split(":").slice(0, 2).join(":"))).toEqual(["v:3", "n:5"]);
   });
 });
