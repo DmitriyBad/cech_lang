@@ -20,9 +20,9 @@ export default function ExercisePage() {
     return (
       <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-soft">
         <h1 className="text-2xl font-bold text-slate-950">Вправи не знайдено</h1>
-        <Link to="/" className="focus-ring mt-4 inline-flex min-h-11 items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white">
+        <Link to="/verbs" className="focus-ring mt-4 inline-flex min-h-11 items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white">
           <ArrowLeft size={18} aria-hidden="true" />
-          На головну
+          До дієслів
         </Link>
       </div>
     );

@@ -18,9 +18,9 @@ export default function VerbPage() {
     return (
       <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-soft">
         <h1 className="text-2xl font-bold text-slate-950">Дієслово не знайдено</h1>
-        <Link to="/" className="focus-ring mt-4 inline-flex min-h-11 items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white">
+        <Link to="/verbs" className="focus-ring mt-4 inline-flex min-h-11 items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white">
           <ArrowLeft size={18} aria-hidden="true" />
-          На головну
+          До дієслів
         </Link>
       </div>
     );
@@ -30,9 +30,9 @@ export default function VerbPage() {
 
   return (
     <div className="space-y-6">
-      <Link to="/" className="focus-ring inline-flex min-h-10 items-center gap-2 rounded-md px-2 text-sm font-semibold text-blue-700 hover:bg-blue-50">
+      <Link to="/verbs" className="focus-ring inline-flex min-h-10 items-center gap-2 rounded-md px-2 text-sm font-semibold text-blue-700 hover:bg-blue-50">
         <ArrowLeft size={18} aria-hidden="true" />
-        На головну
+        До дієслів
       </Link>
 
       <section className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-center">

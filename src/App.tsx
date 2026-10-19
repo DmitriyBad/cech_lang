@@ -1,8 +1,12 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+import { useEffect } from "react";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
+import BottomNav from "./components/BottomNav";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
 import ExercisePage from "./pages/ExercisePage";
 import HomePage from "./pages/HomePage";
+import LearnPage from "./pages/LearnPage";
+import VerbsPage from "./pages/VerbsPage";
 import ModuleExercisePage from "./pages/ModuleExercisePage";
 import ModuleOverviewPage from "./pages/ModuleOverviewPage";
 import ModulePage from "./pages/ModulePage";
@@ -16,14 +20,23 @@ import PhrasesPage from "./pages/PhrasesPage";
 import PronunciationPage from "./pages/PronunciationPage";
 import StatisticsPage from "./pages/StatisticsPage";
 import VerbPage from "./pages/VerbPage";
+import { saveLastVisit } from "./utils/lastVisit";
 
 export default function App() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    saveLastVisit(pathname);
+  }, [pathname]);
+
   return (
     <div className="flex min-h-screen flex-col bg-slate-50 text-slate-950">
       <Header />
-      <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col px-4 py-5 sm:px-6 lg:px-8">
+      <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col px-4 py-5 pb-24 sm:px-6 md:pb-5 lg:px-8">
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/learn" element={<LearnPage />} />
+          <Route path="/verbs" element={<VerbsPage />} />
           <Route path="/verbs/:verbId" element={<VerbPage />} />
           <Route path="/verbs/:verbId/exercises" element={<ExercisePage />} />
           <Route path="/nouns" element={<NounsPage />} />
@@ -43,6 +56,7 @@ export default function App() {
         </Routes>
       </main>
       <Footer />
+      <BottomNav />
     </div>
   );
 }

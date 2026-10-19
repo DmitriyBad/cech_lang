@@ -1,161 +1,139 @@
-import { BookOpen, Dumbbell, Filter, RotateCcw, Trophy } from "lucide-react";
+import { ArrowRight, BookMarked, BookOpen, Dumbbell, GraduationCap, Grid2X2 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import ProgressBar from "../components/ProgressBar";
 import StartGuide from "../components/StartGuide";
-import SearchBar from "../components/SearchBar";
-import VerbCard from "../components/VerbCard";
+import { grammarModules } from "../data/grammarModules";
+import { nouns } from "../data/nouns";
 import { dueSources } from "../data/practice";
 import { verbs } from "../data/verbs";
 import { useProgress } from "../hooks/useProgress";
-import type { VerbLevel } from "../types/Verb";
+import { loadLastVisit } from "../utils/lastVisit";
 
-type LevelFilter = "all" | VerbLevel;
+// Перетворює збережену адресу на назву слова чи уроку; null, якщо такого вже немає.
+const describeVisit = (path: string): { to: string; label: string } | null => {
+  const verb = /^\/verbs\/(\d+)$/.exec(path);
+  if (verb) {
+    const found = verbs.find((item) => item.id === Number(verb[1]));
+    return found ? { to: path, label: "Дієслово " + found.infinitive } : null;
+  }
 
-const filters: Array<{ label: string; value: LevelFilter }> = [
-  { label: "Всі", value: "all" },
-  { label: "A1", value: "A1" },
-  { label: "A2", value: "A2" },
-];
+  const noun = /^\/nouns\/(\d+)$/.exec(path);
+  if (noun) {
+    const found = nouns.find((item) => item.id === Number(noun[1]));
+    return found ? { to: path, label: "Іменник " + found.noun } : null;
+  }
+
+  const lesson = /^\/modules\/([^/]+)\/([^/]+)$/.exec(path);
+  if (lesson) {
+    const found = grammarModules.find((module) => module.id === lesson[1])?.lessons.find((item) => item.id === lesson[2]);
+    return found ? { to: path, label: "Урок «" + found.title + "»" } : null;
+  }
+
+  return null;
+};
 
 export default function HomePage() {
-  const [query, setQuery] = useState("");
-  const [levelFilter, setLevelFilter] = useState<LevelFilter>("all");
-  const { progress, learnedCount, learnedPercent, reviewVerbIds, successRate } = useProgress(verbs.length);
+  const { progress, learnedCount, learnedPercent, successRate, totalAnswers, getModuleStats } = useProgress(verbs.length);
 
-  const filteredVerbs = useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase();
-
-    return verbs.filter((verb) => {
-      const matchesLevel = levelFilter === "all" || verb.level === levelFilter;
-      const matchesQuery =
-        normalizedQuery.length === 0 ||
-        verb.infinitive.toLowerCase().includes(normalizedQuery) ||
-        verb.translation.toLowerCase().includes(normalizedQuery);
-
-      return matchesLevel && matchesQuery;
-    });
-  }, [levelFilter, query]);
-
-  const isFreshVisitor = learnedCount === 0 && progress.correctAnswers + progress.wrongAnswers === 0;
   const dueCount = useMemo(() => dueSources(progress).length, [progress]);
-  const reviewVerbs = verbs.filter((verb) => reviewVerbIds.includes(verb.id));
+  const lastVisit = useMemo(() => describeVisit(loadLastVisit()), []);
+  const nounStats = getModuleStats("nouns", nouns.length);
+  const lessonTotal = grammarModules.reduce((sum, module) => sum + module.lessons.length, 0);
+  const lessonDone = grammarModules.reduce((sum, module) => sum + getModuleStats(module.id, module.lessons.length).learnedCount, 0);
+  const isFreshVisitor = learnedCount === 0 && totalAnswers === 0;
+
+  const sections = [
+    { to: "/verbs", icon: BookOpen, title: "Дієслова", done: learnedCount, total: verbs.length },
+    { to: "/nouns", icon: BookMarked, title: "Іменники", done: nounStats.learnedCount, total: nouns.length },
+    { to: "/modules", icon: Grid2X2, title: "Граматика", done: lessonDone, total: lessonTotal },
+  ];
 
   return (
     <div className="space-y-6">
-      <section className="grid gap-4 lg:grid-cols-[1fr_360px] lg:items-end">
+      <section className="flex items-center gap-3">
+        <span className="grid h-12 w-12 place-items-center rounded-lg bg-blue-600 text-white shadow-soft">
+          <GraduationCap size={26} aria-hidden="true" />
+        </span>
         <div>
-          <div className="flex items-center gap-3">
-            <span className="grid h-12 w-12 place-items-center rounded-lg bg-blue-600 text-white shadow-soft">
-              <BookOpen size={26} aria-hidden="true" />
-            </span>
-            <div>
-              <h1 className="text-3xl font-bold text-slate-950 sm:text-4xl">Вивчаємо чеську мову</h1>
-              <p className="mt-1 text-sm text-slate-600">100 дієслів для рівнів A1–A2</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-soft">
-          <ProgressBar value={learnedPercent} label="Вивчені дієслова" />
+          <h1 className="text-3xl font-bold text-slate-950 sm:text-4xl">Вивчаємо чеську мову</h1>
+          <p className="mt-1 text-sm text-slate-600">Рівні A1–A2: дієслова, іменники, граматика</p>
         </div>
       </section>
+
+      {dueCount > 0 || lastVisit ? (
+        <section className="grid gap-3 md:grid-cols-2" aria-label="Наступні кроки">
+          {dueCount > 0 ? (
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-emerald-200 bg-emerald-50 p-4">
+              <div>
+                <h2 className="flex items-center gap-2 text-lg font-bold text-slate-950">
+                  <Dumbbell size={20} className="text-emerald-700" aria-hidden="true" />
+                  Сьогодні повторити: {dueCount}
+                </h2>
+                <p className="text-sm text-slate-700">Слова й уроки, які пора освіжити.</p>
+              </div>
+              <Link to="/practice?start=due" className="focus-ring inline-flex min-h-11 items-center rounded-md bg-emerald-700 px-4 text-sm font-semibold text-white hover:bg-emerald-800">
+                Почати повторення
+              </Link>
+            </div>
+          ) : null}
+          {lastVisit ? (
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-blue-200 bg-blue-50 p-4">
+              <div>
+                <h2 className="text-lg font-bold text-slate-950">Продовжити</h2>
+                <p className="text-sm text-slate-700">{lastVisit.label}</p>
+              </div>
+              <Link to={lastVisit.to} className="focus-ring inline-flex min-h-11 items-center gap-2 rounded-md bg-blue-600 px-4 text-sm font-semibold text-white hover:bg-blue-700">
+                Продовжити
+                <ArrowRight size={18} aria-hidden="true" />
+              </Link>
+            </div>
+          ) : null}
+        </section>
+      ) : null}
 
       <StartGuide />
 
-      {dueCount > 0 ? (
-        <section className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-emerald-200 bg-emerald-50 p-4" aria-label="Повторення на сьогодні">
-          <div>
-            <h2 className="flex items-center gap-2 text-lg font-bold text-slate-950">
-              <Dumbbell size={20} className="text-emerald-700" aria-hidden="true" />
-              Сьогодні повторити: {dueCount}
-            </h2>
-            <p className="text-sm text-slate-700">Слова й уроки, які пора освіжити за графіком повторення.</p>
-          </div>
-          <Link to="/practice?start=due" className="focus-ring inline-flex min-h-11 items-center rounded-md bg-emerald-700 px-4 text-sm font-semibold text-white hover:bg-emerald-800">
-            Почати повторення
-          </Link>
-        </section>
-      ) : null}
-
-      {isFreshVisitor ? null : (
-      <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-soft">
-          <p className="text-sm text-slate-500">Усього дієслів</p>
-          <p className="mt-1 text-2xl font-bold text-slate-950">{verbs.length}</p>
-        </div>
-        <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-soft">
-          <p className="text-sm text-slate-500">Вивчено</p>
-          <p className="mt-1 text-2xl font-bold text-slate-950">{learnedCount}</p>
-        </div>
-        <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-soft">
-          <p className="text-sm text-slate-500">Успішність</p>
-          <p className="mt-1 text-2xl font-bold text-slate-950">{successRate}%</p>
-        </div>
-        <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-soft">
-          <p className="text-sm text-slate-500">Потрібно повторити</p>
-          <p className="mt-1 text-2xl font-bold text-slate-950">{reviewVerbIds.length}</p>
-        </div>
-      </section>
-      )}
-
-      {reviewVerbs.length > 0 ? (
-        <section className="space-y-3">
-          <div className="flex items-center gap-2">
-            <RotateCcw size={20} className="text-amber-600" aria-hidden="true" />
-            <h2 className="text-xl font-semibold text-slate-950">Потрібно повторити</h2>
-          </div>
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-            {reviewVerbs.map((verb) => (
-              <VerbCard
-                key={"review-" + verb.id}
-                verb={verb}
-                isLearned={progress.learnedVerbIds.includes(verb.id)}
-                needsReview
-              />
-            ))}
-          </div>
-        </section>
-      ) : null}
-
-      <section className="space-y-4">
-        <div className="grid gap-3 lg:grid-cols-[1fr_auto]">
-          <SearchBar value={query} onChange={setQuery} />
-
-          <div className="flex min-h-12 items-center gap-2 rounded-lg border border-slate-200 bg-white p-1 shadow-soft">
-            <Filter className="ml-2 text-slate-400" size={18} aria-hidden="true" />
-            {filters.map((filter) => (
-              <button
-                key={filter.value}
-                type="button"
-                onClick={() => setLevelFilter(filter.value)}
-                className={[
-                  "focus-ring min-h-10 rounded-md px-4 text-sm font-semibold transition",
-                  levelFilter === filter.value ? "bg-blue-600 text-white" : "text-slate-600 hover:bg-slate-100",
-                ].join(" ")}
-              >
-                {filter.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2 text-sm text-slate-500">
-          <Trophy size={18} aria-hidden="true" />
-          Знайдено: {filteredVerbs.length}
-        </div>
-
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {filteredVerbs.map((verb) => (
-            <VerbCard
-              key={verb.id}
-              verb={verb}
-              isLearned={progress.learnedVerbIds.includes(verb.id)}
-              needsReview={reviewVerbIds.includes(verb.id)}
-            />
+      <section className="space-y-3">
+        <h2 className="text-xl font-semibold text-slate-950">Що вчити</h2>
+        <div className="grid gap-3 md:grid-cols-3">
+          {sections.map((section) => (
+            <Link key={section.to} to={section.to} className="focus-ring block rounded-lg border border-slate-200 bg-white p-4 shadow-soft transition hover:border-blue-300">
+              <span className="flex items-center gap-3 text-lg font-semibold text-slate-950">
+                <span className="grid h-10 w-10 place-items-center rounded-md bg-blue-50 text-blue-700">
+                  <section.icon size={20} aria-hidden="true" />
+                </span>
+                {section.title}
+              </span>
+              <div className="mt-3">
+                <ProgressBar value={section.total === 0 ? 0 : Math.round((section.done / section.total) * 100)} label={section.done + " з " + section.total} />
+              </div>
+            </Link>
           ))}
         </div>
       </section>
+
+      {isFreshVisitor ? null : (
+        <section className="grid gap-3 sm:grid-cols-3" aria-label="Підсумок">
+          <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-soft">
+            <p className="text-sm text-slate-600">Вивчено дієслів</p>
+            <p className="mt-1 text-2xl font-bold text-slate-950">{learnedCount} <span className="text-base font-medium text-slate-600">({learnedPercent}%)</span></p>
+          </div>
+          <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-soft">
+            <p className="text-sm text-slate-600">Відповідей</p>
+            <p className="mt-1 text-2xl font-bold text-slate-950">{totalAnswers}</p>
+          </div>
+          <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-soft">
+            <p className="text-sm text-slate-600">Успішність</p>
+            <p className="mt-1 text-2xl font-bold text-slate-950">{successRate}%</p>
+          </div>
+        </section>
+      )}
+
+      <Link to="/practice" className="focus-ring inline-flex min-h-11 w-fit items-center gap-2 rounded-md bg-blue-600 px-4 text-sm font-semibold text-white hover:bg-blue-700">
+        <Dumbbell size={18} aria-hidden="true" />
+        Перейти до тренування
+      </Link>
     </div>
   );
 }

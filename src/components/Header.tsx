@@ -56,10 +56,14 @@ export default function Header() {
           </button>
         </form>
 
-        <nav className="flex gap-2 overflow-x-auto pb-1 xl:justify-end xl:pb-0" aria-label="Основна навігація">
+        <nav className="hidden gap-2 md:flex xl:justify-end" aria-label="Основна навігація">
           <NavLink to="/" className={navLinkClass} end>
             <Home size={18} aria-hidden="true" />
             Головна
+          </NavLink>
+          <NavLink to="/verbs" className={navLinkClass}>
+            <BookOpen size={18} aria-hidden="true" />
+            Дієслова
           </NavLink>
           <NavLink to="/nouns" className={navLinkClass}>
             <BookMarked size={18} aria-hidden="true" />
