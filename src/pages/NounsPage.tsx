@@ -6,6 +6,7 @@ import ProgressBar from "../components/ProgressBar";
 import SearchBar from "../components/SearchBar";
 import { caseInfo, nouns } from "../data/nouns";
 import { useProgress } from "../hooks/useProgress";
+import { matchesSearch } from "../utils/search";
 import type { Noun } from "../types/Noun";
 
 type GenderFilter = "all" | Noun["gender"];
@@ -24,14 +25,9 @@ export default function NounsPage() {
   const nounStats = getModuleStats("nouns", nouns.length);
 
   const filteredNouns = useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase();
-
     return nouns.filter((noun) => {
       const matchesGender = genderFilter === "all" || noun.gender === genderFilter;
-      const matchesQuery =
-        normalizedQuery.length === 0 ||
-        noun.noun.toLowerCase().includes(normalizedQuery) ||
-        noun.translation.toLowerCase().includes(normalizedQuery);
+      const matchesQuery = matchesSearch(query, noun.noun, noun.translation);
 
       return matchesGender && matchesQuery;
     });
@@ -76,7 +72,7 @@ export default function NounsPage() {
 
       <section className="space-y-4">
         <div className="grid gap-3 lg:grid-cols-[1fr_auto]">
-          <SearchBar value={query} onChange={setQuery} />
+          <SearchBar value={query} onChange={setQuery} label="Пошук іменників" placeholder="Пошук іменника або перекладу" />
           <div className="flex min-h-12 items-center gap-2 rounded-lg border border-slate-200 bg-white p-1 shadow-soft">
             <Filter className="ml-2 text-slate-400" size={18} aria-hidden="true" />
             {filters.map((filter) => (

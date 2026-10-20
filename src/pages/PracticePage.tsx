@@ -261,11 +261,12 @@ export default function PracticePage() {
 
       {item ? (
         <>
-          <ExerciseBlock key={session.id + "-" + index} exercise={item.exercise} index={index} onAnswer={handleAnswer} />
+          <ExerciseBlock key={session.id + "-" + index} exercise={item.exercise} index={index} onAnswer={handleAnswer} shortcuts />
           <div className="flex flex-wrap items-center gap-2">
             {answered ? (
               <button
                 type="button"
+                autoFocus
                 onClick={() => setViewIndex(index + 1)}
                 className="focus-ring inline-flex min-h-11 items-center gap-2 rounded-md bg-blue-600 px-4 text-sm font-semibold text-white hover:bg-blue-700"
               >

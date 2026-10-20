@@ -1,8 +1,10 @@
 import { CheckCircle2, ChevronDown, ChevronUp, Keyboard, XCircle } from "lucide-react";
-import { FormEvent, useMemo, useRef, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import type { Exercise } from "../types/Verb";
 import { useAnswerMode } from "../hooks/useAnswerMode";
+import { diffAnswer } from "../utils/answerDiff";
 import { isTypeable, matchAnswer, type MatchResult } from "../utils/answerMatch";
+import { adaptQuestion } from "../utils/questionText";
 import SpeakButton from "./SpeakButton";
 
 const czechLetters = ["á", "č", "ď", "é", "ě", "í", "ň", "ó", "ř", "š", "ť", "ú", "ů", "ý", "ž"];
@@ -12,9 +14,11 @@ interface ExerciseBlockProps {
   index: number;
   /** `given` — вибраний чи введений текст (порожній, якщо натиснули «Не знаю»). */
   onAnswer: (isCorrect: boolean, given?: string) => void;
+  /** Клавіші 1–9 обирають варіант. Вмикаємо лише там, де на екрані одна вправа. */
+  shortcuts?: boolean;
 }
 
-export default function ExerciseBlock({ exercise, index, onAnswer }: ExerciseBlockProps) {
+export default function ExerciseBlock({ exercise, index, onAnswer, shortcuts = false }: ExerciseBlockProps) {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [typedDraft, setTypedDraft] = useState("");
   const [typedResult, setTypedResult] = useState<MatchResult | "gave-up" | null>(null);
@@ -39,7 +43,7 @@ export default function ExerciseBlock({ exercise, index, onAnswer }: ExerciseBlo
 
     return shuffled;
   }, [exercise.options]);
-  const [questionTitle, ...questionDetails] = exercise.question.split("\n");
+  const [questionTitle, ...questionDetails] = adaptQuestion(exercise.question, useTyping).split("\n");
 
   // Що можна послухати після відповіді. Чеський голос не повинен отримувати українську, тому
   // повертаємо текст лише якщо в ньому немає кирилиці; для решти вправ (граматичні терміни,
@@ -86,6 +90,38 @@ export default function ExerciseBlock({ exercise, index, onAnswer }: ExerciseBlo
     setSelectedAnswer(answer);
     onAnswer(answer === exercise.correctAnswer, answer);
   };
+
+  useEffect(() => {
+    if (!shortcuts || useTyping || isAnswered) {
+      return;
+    }
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      const typingInField = target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement;
+
+      if (typingInField || event.ctrlKey || event.metaKey || event.altKey) {
+        return;
+      }
+
+      const option = options[Number(event.key) - 1];
+
+      if (option !== undefined) {
+        event.preventDefault();
+        handleAnswer(option);
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+    // handleAnswer залежить лише від стану, який у цьому ефекті вже врахований через isAnswered.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shortcuts, useTyping, isAnswered, options]);
+
+  const typedDiff = useMemo(
+    () => (typedResult === "wrong" && typedDraft.trim().length > 0 ? diffAnswer(typedDraft, exercise.correctAnswer) : null),
+    [typedResult, typedDraft, exercise.correctAnswer],
+  );
 
   const submitTyped = (event: FormEvent) => {
     event.preventDefault();
@@ -218,6 +254,7 @@ export default function ExerciseBlock({ exercise, index, onAnswer }: ExerciseBlo
                     isAnswered ? "cursor-default" : "",
                   ].join(" ")}
                 >
+                  {shortcuts ? <span aria-hidden="true" className="mr-2 hidden text-xs font-bold text-slate-500 sm:inline">{options.indexOf(option) + 1}</span> : null}
                   {option}
                 </button>
               );
@@ -242,6 +279,34 @@ export default function ExerciseBlock({ exercise, index, onAnswer }: ExerciseBlo
                     ? "Правильно"
                     : "Неправильно. Правильна відповідь: " + exercise.correctAnswer}
               </span>
+            </div>
+          ) : null}
+
+          {typedDiff ? (
+            <div className="mt-3 space-y-1 rounded-md border border-slate-200 bg-white px-3 py-2 text-base">
+              <p>
+                <span className="text-sm font-medium text-slate-700">Ви написали: </span>
+                <span lang="cs" className="font-semibold text-slate-950">
+                  {typedDiff.typed.map((item, position) => (
+                    <span key={position} className={item.bad ? "rounded bg-rose-100 px-0.5 font-bold text-rose-800 underline decoration-wavy" : ""}>{item.char}</span>
+                  ))}
+                </span>
+              </p>
+              <p>
+                <span className="text-sm font-medium text-slate-700">Правильно: </span>
+                <span lang="cs" className="font-semibold text-slate-950">
+                  {typedDiff.correct.map((item, position) => (
+                    <span key={position} className={item.bad ? "rounded bg-emerald-100 px-0.5 font-bold text-emerald-800 underline" : ""}>{item.char}</span>
+                  ))}
+                </span>
+              </p>
+              <p className="text-sm text-slate-700">
+                {typedDiff.diacriticsOnly
+                  ? "Різниця лише в діакритиці."
+                  : typedDiff.distance === 1
+                    ? "Помилка в одній літері."
+                    : "Відмінних літер: " + typedDiff.distance + "."}
+              </p>
             </div>
           ) : null}
 

@@ -25,6 +25,7 @@ import ConsentBanner from "./components/ConsentBanner";
 import AdminPage from "./pages/AdminPage";
 import PrivacyPage from "./pages/PrivacyPage";
 import { track } from "./lib/analytics";
+import { documentTitle } from "./utils/pageTitle";
 import { startSync } from "./lib/sync";
 import { saveLastVisit } from "./utils/lastVisit";
 
@@ -38,6 +39,7 @@ export default function App() {
   useEffect(() => {
     saveLastVisit(pathname);
     track("pageview", pathname);
+    document.title = documentTitle(pathname);
   }, [pathname]);
 
   return (

@@ -5,6 +5,7 @@ import SearchBar from "../components/SearchBar";
 import VerbCard from "../components/VerbCard";
 import { verbs } from "../data/verbs";
 import { useProgress } from "../hooks/useProgress";
+import { matchesSearch } from "../utils/search";
 import type { VerbLevel } from "../types/Verb";
 
 type LevelFilter = "all" | VerbLevel;
@@ -21,14 +22,9 @@ export default function VerbsPage() {
   const { progress, learnedCount, learnedPercent, reviewVerbIds, successRate } = useProgress(verbs.length);
 
   const filteredVerbs = useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase();
-
     return verbs.filter((verb) => {
       const matchesLevel = levelFilter === "all" || verb.level === levelFilter;
-      const matchesQuery =
-        normalizedQuery.length === 0 ||
-        verb.infinitive.toLowerCase().includes(normalizedQuery) ||
-        verb.translation.toLowerCase().includes(normalizedQuery);
+      const matchesQuery = matchesSearch(query, verb.infinitive, verb.translation);
 
       return matchesLevel && matchesQuery;
     });
