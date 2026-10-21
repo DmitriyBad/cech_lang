@@ -11,6 +11,7 @@ import {
   subscribeToProgress,
 } from "../utils/storage";
 import { track } from "../lib/analytics";
+import { addAnswer, normalizeGoal } from "../utils/daily";
 import { reviewCard, todayNumber } from "../utils/srs";
 
 // Правильна відповідь зменшує лічильник помилок, щоб вивчене слово виходило зі списку повторення.
@@ -95,6 +96,7 @@ export function useProgress(totalVerbs = 0) {
               [verbId]: (current.mistakesByVerbId[verbId] ?? 0) + 1,
             },
         srs: updateSrs(current.srs, "v:" + verbId, isCorrect),
+        activity: addAnswer(current.activity, todayNumber(), isCorrect),
       }));
       track("answer", undefined, { correct: isCorrect, key: "v:" + verbId });
     },
@@ -145,6 +147,7 @@ export function useProgress(totalVerbs = 0) {
           ...current,
           correctAnswers: current.correctAnswers + (isCorrect ? 1 : 0),
           wrongAnswers: current.wrongAnswers + (isCorrect ? 0 : 1),
+          activity: addAnswer(current.activity, todayNumber(), isCorrect),
           // Читання вголос не має карток повторення: речення не є словом чи уроком.
           srs: moduleId === "speaking" ? current.srs : updateSrs(current.srs, (moduleId === "nouns" ? "n:" : "l:") + itemId, isCorrect),
           moduleProgress: {
@@ -188,6 +191,13 @@ export function useProgress(totalVerbs = 0) {
     [progress.moduleProgress],
   );
 
+  const setDailyGoal = useCallback(
+    (goal: number) => {
+      updateProgress((current) => ({ ...current, dailyGoal: normalizeGoal(goal) }));
+    },
+    [updateProgress],
+  );
+
   const resetProgress = useCallback(() => {
     const nickname = loadActiveNickname();
     resetStoredProgress(nickname);
@@ -221,5 +231,6 @@ export function useProgress(totalVerbs = 0) {
     markModuleItemLearned,
     registerModuleAnswer,
     resetProgress,
+    setDailyGoal,
   };
 }

@@ -1,4 +1,4 @@
-import { BarChart3, BookMarked, BookOpen, Dumbbell, Grid2X2, Home, UserRound } from "lucide-react";
+import { BarChart3, BookMarked, BookOpen, Dumbbell, Grid2X2, Home, Route as RouteIcon, UserRound } from "lucide-react";
 import { Link, NavLink } from "react-router-dom";
 import { verbs } from "../data/verbs";
 import { useProgress } from "../hooks/useProgress";
@@ -38,6 +38,10 @@ export default function Header() {
           <NavLink to="/" className={navLinkClass} end>
             <Home size={18} aria-hidden="true" />
             Головна
+          </NavLink>
+          <NavLink to="/course" className={navLinkClass}>
+            <RouteIcon size={18} aria-hidden="true" />
+            Курс
           </NavLink>
           <NavLink to="/verbs" className={navLinkClass}>
             <BookOpen size={18} aria-hidden="true" />

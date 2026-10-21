@@ -1,18 +1,22 @@
-import { BookMarked, BookOpen, Grid2X2 } from "lucide-react";
+import { BookMarked, BookOpen, Grid2X2, Route as RouteIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 import ProgressBar from "../components/ProgressBar";
+import { courseSummary } from "../data/course";
 import { grammarModules } from "../data/grammarModules";
 import { nouns } from "../data/nouns";
 import { verbs } from "../data/verbs";
 import { useProgress } from "../hooks/useProgress";
 
 export default function LearnPage() {
-  const { learnedCount, getModuleStats } = useProgress(verbs.length);
+  const { progress, learnedCount, getModuleStats } = useProgress(verbs.length);
   const nounStats = getModuleStats("nouns", nouns.length);
   const lessonTotal = grammarModules.reduce((sum, module) => sum + module.lessons.length, 0);
   const lessonDone = grammarModules.reduce((sum, module) => sum + getModuleStats(module.id, module.lessons.length).learnedCount, 0);
 
+  const course = courseSummary(progress);
+
   const sections = [
+    { to: "/course", icon: RouteIcon, title: "Курс A1 → A2", text: "Покрокова черга уроків: що вчити далі", done: course.done, total: course.total },
     { to: "/verbs", icon: BookOpen, title: "Дієслова", text: "Відмінювання, минулий і майбутній час, приклади", done: learnedCount, total: verbs.length },
     { to: "/nouns", icon: BookMarked, title: "Іменники", text: "Відмінки однини й множини, правила відмінювання", done: nounStats.learnedCount, total: nouns.length },
     { to: "/modules", icon: Grid2X2, title: "Граматика", text: "Числа, дати, прикметники, прийменники, часи", done: lessonDone, total: lessonTotal },
@@ -25,7 +29,7 @@ export default function LearnPage() {
         <p className="mt-2 text-slate-600">Оберіть, що вчити сьогодні.</p>
       </section>
 
-      <section className="grid gap-4 md:grid-cols-3">
+      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {sections.map((section) => (
           <Link key={section.to} to={section.to} className="focus-ring block rounded-lg border border-slate-200 bg-white p-5 shadow-soft transition hover:border-blue-300">
             <span className="grid h-11 w-11 place-items-center rounded-md bg-blue-50 text-blue-700">

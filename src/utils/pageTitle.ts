@@ -7,6 +7,7 @@ export const SITE_TITLE = "Česky A1–A2";
 const staticTitles: Record<string, string> = {
   "/": "Головна",
   "/learn": "Вчити",
+  "/course": "Курс A1–A2",
   "/verbs": "Дієслова",
   "/nouns": "Іменники",
   "/nouns/rules": "Правила відмінювання іменників",

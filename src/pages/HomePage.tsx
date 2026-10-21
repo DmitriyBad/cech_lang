@@ -1,8 +1,10 @@
 import { ArrowRight, BookMarked, BookOpen, Dumbbell, GraduationCap, Grid2X2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useMemo } from "react";
+import DailyCard from "../components/DailyCard";
 import ProgressBar from "../components/ProgressBar";
 import StartGuide from "../components/StartGuide";
+import { courseSummary, nextSteps } from "../data/course";
 import { grammarModules } from "../data/grammarModules";
 import { nouns } from "../data/nouns";
 import { dueSources } from "../data/practice";
@@ -41,6 +43,8 @@ export default function HomePage() {
   const nounStats = getModuleStats("nouns", nouns.length);
   const lessonTotal = grammarModules.reduce((sum, module) => sum + module.lessons.length, 0);
   const lessonDone = grammarModules.reduce((sum, module) => sum + getModuleStats(module.id, module.lessons.length).learnedCount, 0);
+  const course = useMemo(() => courseSummary(progress), [progress]);
+  const upcoming = useMemo(() => nextSteps(progress, 1)[0], [progress]);
   const isFreshVisitor = learnedCount === 0 && totalAnswers === 0;
 
   const sections = [
@@ -59,6 +63,19 @@ export default function HomePage() {
           <h1 className="text-3xl font-bold text-slate-950 sm:text-4xl">Вивчаємо чеську мову</h1>
           <p className="mt-1 text-sm text-slate-600">Рівні A1–A2: дієслова, іменники, граматика</p>
         </div>
+      </section>
+
+      <DailyCard progress={progress} />
+
+      <section className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-blue-200 bg-blue-50 p-4" aria-label="Курс">
+        <div>
+          <h2 className="text-lg font-bold text-slate-950">Курс A1 → A2: {course.done} з {course.total} кроків</h2>
+          <p className="text-sm text-slate-700">{upcoming ? "Далі: " + upcoming.title : "Курс пройдено. Закріплюйте у «Тренуванні»."}</p>
+        </div>
+        <Link to={upcoming ? upcoming.to : "/course"} className="focus-ring inline-flex min-h-11 items-center gap-2 rounded-md bg-blue-700 px-4 text-sm font-semibold text-white hover:bg-blue-800">
+          {course.done === 0 ? "Почати курс" : "Продовжити курс"}
+          <ArrowRight size={18} aria-hidden="true" />
+        </Link>
       </section>
 
       {dueCount > 0 || lastVisit ? (

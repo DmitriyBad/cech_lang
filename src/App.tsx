@@ -5,6 +5,7 @@ import Footer from "./components/Footer";
 import Header from "./components/Header";
 import ExercisePage from "./pages/ExercisePage";
 import HomePage from "./pages/HomePage";
+import CoursePage from "./pages/CoursePage";
 import LearnPage from "./pages/LearnPage";
 import VerbsPage from "./pages/VerbsPage";
 import ModuleExercisePage from "./pages/ModuleExercisePage";
@@ -52,6 +53,7 @@ export default function App() {
           <Route path="/privacy" element={<PrivacyPage />} />
           <Route path="/admin" element={<AdminPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/course" element={<CoursePage />} />
           <Route path="/learn" element={<LearnPage />} />
           <Route path="/verbs" element={<VerbsPage />} />
           <Route path="/verbs/:verbId" element={<VerbPage />} />

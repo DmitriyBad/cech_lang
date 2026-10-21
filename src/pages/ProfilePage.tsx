@@ -1,6 +1,7 @@
 import { Cloud, LogOut, Mail, Save, ShieldCheck, UserRound } from "lucide-react";
 import { FormEvent, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { GOAL_OPTIONS } from "../utils/daily";
 import { verbs } from "../data/verbs";
 import { useProgress } from "../hooks/useProgress";
 import { setConsent, useConsent } from "../lib/analytics";
@@ -16,7 +17,7 @@ const statusText = {
 } as const;
 
 export default function ProfilePage() {
-  const { activeNickname, changeNickname, learnedCount, totalAnswers, successRate } = useProgress(verbs.length);
+  const { progress, setDailyGoal, activeNickname, changeNickname, learnedCount, totalAnswers, successRate } = useProgress(verbs.length);
   const { session, isAdmin, ready } = useAuth();
   const syncStatus = useSyncStatus();
   const consent = useConsent();
@@ -190,6 +191,24 @@ export default function ProfilePage() {
         <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-soft">
           <p className="text-sm text-slate-700">Успішність</p>
           <p className="mt-1 text-2xl font-bold text-slate-950">{successRate}%</p>
+        </div>
+      </section>
+
+      <section className="max-w-xl space-y-3 rounded-lg border border-slate-200 bg-white p-4 shadow-soft" aria-label="Щоденна ціль">
+        <h2 className="text-lg font-bold text-slate-950">Щоденна ціль</h2>
+        <p className="text-sm text-slate-700">Скільки відповідей у вправах на день рахувати за виконану ціль.</p>
+        <div className="flex flex-wrap gap-2" role="group" aria-label="Обрати щоденну ціль">
+          {GOAL_OPTIONS.map((goal) => (
+            <button
+              key={goal}
+              type="button"
+              onClick={() => setDailyGoal(goal)}
+              aria-pressed={progress.dailyGoal === goal}
+              className={"focus-ring min-h-11 rounded-md px-4 text-sm font-semibold " + (progress.dailyGoal === goal ? "bg-blue-700 text-white" : "bg-white text-slate-800 ring-1 ring-inset ring-slate-300 hover:bg-slate-100")}
+            >
+              {goal} на день
+            </button>
+          ))}
         </div>
       </section>
 

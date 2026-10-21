@@ -7,7 +7,7 @@ const tabClass = (active: boolean) =>
     active ? "text-blue-700" : "text-slate-600 hover:text-blue-700",
   ].join(" ");
 
-const learnPaths = ["/learn", "/verbs", "/nouns", "/modules", "/start"];
+const learnPaths = ["/learn", "/course", "/verbs", "/nouns", "/modules", "/start"];
 
 // Нижня панель вкладок для телефонів; на широких екранах працює верхнє меню.
 export default function BottomNav() {

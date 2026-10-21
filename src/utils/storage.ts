@@ -1,3 +1,4 @@
+import { DEFAULT_GOAL, mergeActivity, normalizeActivity, normalizeGoal, type ActivityLog } from "./daily";
 import { normalizeCard, type SrsCard } from "./srs";
 
 export interface ModuleProgress {
@@ -15,6 +16,10 @@ export interface StoredProgress {
   moduleProgress: Record<string, ModuleProgress>;
   /** Інтервальне повторення: ключ «v:12» (дієслово), «n:5» (іменник), «l:plural-masc-animate» (урок). */
   srs: Record<string, SrsCard>;
+  /** Відповіді за днями: для щоденної цілі й серії. */
+  activity: ActivityLog;
+  /** Щоденна ціль: кількість відповідей. */
+  dailyGoal: number;
 }
 
 type ProgressByNickname = Record<string, StoredProgress>;
@@ -37,6 +42,8 @@ export const emptyProgress: StoredProgress = {
   mistakesByVerbId: {},
   moduleProgress: {},
   srs: {},
+  activity: {},
+  dailyGoal: DEFAULT_GOAL,
 };
 
 const hasStorage = () => {
@@ -61,6 +68,7 @@ const profileKey = (nickname: string) => nicknameKey(nickname) || GUEST_PROFILE_
 const hasActivity = (progress: StoredProgress) =>
   progress.learnedVerbIds.length > 0 ||
   progress.correctAnswers + progress.wrongAnswers > 0 ||
+  Object.keys(progress.activity).length > 0 ||
   Object.values(progress.moduleProgress).some(
     (module) => module.completedItemIds.length > 0 || module.correctAnswers + module.wrongAnswers > 0,
   );
@@ -100,6 +108,8 @@ export const normalizeProgress = (value: Partial<StoredProgress> | null | undefi
             .filter((entry): entry is readonly [string, SrsCard] => entry[1] !== null),
         )
       : {},
+  activity: normalizeActivity(value?.activity),
+  dailyGoal: normalizeGoal(value?.dailyGoal),
 });
 
 const loadProgressStore = (): ProgressByNickname => {
@@ -249,6 +259,9 @@ export const mergeProgress = (a: StoredProgress, b: StoredProgress): StoredProgr
     mistakesByVerbId: maxRecord(a.mistakesByVerbId, b.mistakesByVerbId),
     moduleProgress,
     srs,
+    activity: mergeActivity(a.activity, b.activity),
+    // Мета — налаштування цього пристрою (першого аргументу), а не результат навчання.
+    dailyGoal: a.dailyGoal,
   };
 };
 
