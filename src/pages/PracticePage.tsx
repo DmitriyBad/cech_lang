@@ -193,7 +193,7 @@ export default function PracticePage() {
                     ))}
                     <p className="mt-2 text-sm text-rose-700">Ваша відповідь: {answer!.given || "пропущено"}</p>
                     <p className="text-sm font-semibold text-emerald-700">
-                      Правильно: <span lang={/[Ѐ-ӿ]/.test(item!.exercise.correctAnswer) ? undefined : "cs"}>{item!.exercise.correctAnswer}</span>
+                      Правильно: <span lang={/[Ѐ-ӿ]/.test(item!.exercise.answerText ?? item!.exercise.correctAnswer) ? undefined : "cs"}>{item!.exercise.answerText ?? item!.exercise.correctAnswer}</span>
                     </p>
                     <Link to={item!.link} className="focus-ring mt-2 inline-flex min-h-10 items-center gap-1 rounded-md text-sm font-semibold text-blue-700 underline">
                       Повторити: {item!.label}

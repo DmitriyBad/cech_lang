@@ -10,7 +10,9 @@ export const adaptQuestion = (question: string, typing: boolean): string => {
       .replace(/Vyberte správné slovo/g, "Napište správné slovo")
       .replace(/Оберіть/g, hasGap ? "Впишіть" : "Напишіть")
       .replace(/Доповніть форму/g, "Впишіть форму")
-      .replace(/Доповніть:/g, "Впишіть пропущене слово:");
+      .replace(/Доповніть:/g, "Впишіть пропущене слово:")
+      .replace(/Складіть/g, "Напишіть")
+      .replace(/складіть/g, "напишіть");
   }
 
   return question.replace(/Доповніть форму/g, "Оберіть форму").replace(/Доповніть:/g, "Оберіть пропущене слово:");

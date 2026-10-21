@@ -1,5 +1,6 @@
 import type { Example, Exercise } from "../types/Verb";
 import type { CzechCaseKey, Noun, NounCaseForms } from "../types/Noun";
+import { buildDictationExercise, buildErrorExercise, buildSentenceExercise, coreWord, isBuildable, tokenize } from "./sentenceExercises";
 import { explainNounExercise } from "./explanations";
 import { nounExamplesA } from "./nounExamplesA";
 import { nounExamplesB } from "./nounExamplesB";
@@ -1477,6 +1478,122 @@ const patternByParadigm: Partial<Record<NounSeed["paradigm"], string>> = {
   neuterI: "nadrazi",
 };
 
+const caseOrder: CzechCaseKey[] = ["genitive", "dative", "accusative", "locative", "instrumental"];
+
+// Прийменники, після яких відмінок завжди один (без v, na, za, před…, які мають два).
+const prepositionCase: Record<string, CzechCaseKey> = {
+  bez: "genitive", do: "genitive", od: "genitive", z: "genitive", ze: "genitive", u: "genitive", vedle: "genitive", kolem: "genitive", podle: "genitive", během: "genitive",
+  k: "dative", ke: "dative", díky: "dative", proti: "dative",
+  o: "locative", při: "locative",
+  s: "instrumental", se: "instrumental",
+  pro: "accusative", přes: "accusative",
+};
+
+// Речення про одне слово: складання, диктант і пошук помилки (замість потрібного відмінка стоїть називний).
+const buildNounSentenceExercises = (noun: Pick<Noun, "noun" | "singular" | "plural">, examples: Example[]): Exercise[] => {
+  const pool = examples.filter((example) => isBuildable(example.cz));
+  const exercises: Exercise[] = pool.slice(0, 1).map(buildSentenceExercise);
+
+  if (pool.length > 0) {
+    exercises.push(buildDictationExercise(pool[Math.min(1, pool.length - 1)]));
+  }
+
+  for (const example of pool) {
+    const tokens = tokenize(example.cz);
+
+    for (const number of ["singular", "plural"] as const) {
+      const nominative = noun[number].nominative;
+
+      for (const key of caseOrder) {
+        const form = noun[number][key];
+        const position = tokens.findIndex((token) => coreWord(token) === form.toLowerCase());
+
+        // Форма збігається з називним (dům, knihy…): заміна не дала б помилки.
+        if (position < 0 || form.toLowerCase() === nominative.toLowerCase() || tokens.some((token) => coreWord(token) === nominative.toLowerCase())) {
+          continue;
+        }
+
+        const wrongTokens = [...tokens];
+        wrongTokens[position] = tokens[position].replace(coreWord(tokens[position]), nominative).replace(/^./, (char) => (position === 0 ? char.toUpperCase() : char));
+        // Форма може збігатися в кількох відмінках (studenta = genitiv і akuzativ): називаємо всі.
+        const preposition = position > 0 ? coreWord(tokens[position - 1]) : "";
+        const required = prepositionCase[preposition];
+        const caseNames = caseOrder
+          .filter((candidate) => noun[number][candidate].toLowerCase() === form.toLowerCase())
+          .filter((candidate, _index, all) => !required || !all.includes(required) || candidate === required)
+          .map((candidate) => caseInfo.find((item) => item.key === candidate)?.title.replace(/^\d+\.\s*/, "") ?? candidate)
+          .join(" / ");
+        const exercise = buildErrorExercise(example, wrongTokens.join(" "), [
+          (required ? "Після «" + preposition + "» " : "Тут ") + "потрібна форма відмінка " + caseNames + " (" + (number === "singular" ? "однина" : "множина") + "): «" + form + "», а не називний «" + nominative + "».",
+        ]);
+
+        if (exercise) {
+          exercises.push(exercise);
+          return exercises;
+        }
+      }
+    }
+  }
+
+  return exercises;
+};
+
+// Вправи «яка форма після прийменника»: прийменник вимагає одного відмінка, треба поставити слово в нього.
+const prepositionDrill: Array<{ preposition: string; key: CzechCaseKey }> = [
+  { preposition: "bez", key: "genitive" },
+  { preposition: "do", key: "genitive" },
+  { preposition: "od", key: "genitive" },
+  { preposition: "vedle", key: "genitive" },
+  { preposition: "k", key: "dative" },
+  { preposition: "o", key: "locative" },
+  { preposition: "s", key: "instrumental" },
+  { preposition: "pro", key: "accusative" },
+];
+
+const caseNames: Record<CzechCaseKey, string> = {
+  nominative: "називний (nominativ)",
+  genitive: "родовий (genitiv)",
+  dative: "давальний (dativ)",
+  accusative: "знахідний (akuzativ)",
+  vocative: "кличний (vokativ)",
+  locative: "місцевий (lokál)",
+  instrumental: "орудний (instrumentál)",
+};
+
+// Перед деякими початками слів прийменник має повну форму (se, ke): такі слова пропускаємо, щоб не плутати.
+const needsLongForm = (preposition: string, word: string) =>
+  (preposition === "s" && /^[szšž]/i.test(word)) || (preposition === "k" && /^[kg]/i.test(word));
+
+const buildPrepositionExercises = (noun: Pick<Noun, "noun" | "translation" | "singular" | "plural">): Exercise[] => {
+  const seed = Array.from(noun.noun).reduce((sum, char) => sum + char.charCodeAt(0), 0);
+  const chosen: typeof prepositionDrill = [];
+
+  for (let step = 0; step < prepositionDrill.length && chosen.length < 2; step += 1) {
+    const candidate = prepositionDrill[(seed + step * 3) % prepositionDrill.length];
+    const form = noun.singular[candidate.key];
+
+    if (!needsLongForm(candidate.preposition, form) && !chosen.some((item) => item.key === candidate.key || item.preposition === candidate.preposition)) {
+      chosen.push(candidate);
+    }
+  }
+
+  return chosen.map(({ preposition, key }) => {
+    const correct = noun.singular[key];
+    const others = (["nominative", "genitive", "dative", "accusative", "locative", "instrumental"] as CzechCaseKey[]).map((other) => noun.singular[other]);
+    const info = caseInfo.find((item) => item.key === key);
+
+    return {
+      question: "Оберіть форму слова “" + noun.noun + "” (" + noun.translation + ") після прийменника “" + preposition + "”\n" + preposition + " ___",
+      options: withOptions(correct, others),
+      correctAnswer: correct,
+      explanation: [
+        "Прийменник «" + preposition + "» завжди вимагає " + caseNames[key] + " відмінка" + (info ? ": питання " + info.question.replace(/^UA: /, "") : "") + ".",
+        preposition + " " + noun.noun + " → " + preposition + " " + correct + ".",
+      ],
+    };
+  }).filter((exercise) => new Set(exercise.options).size >= 2);
+};
+
 export const nouns: Noun[] = nounSeeds.map((seed, index) => {
   const declined = decline(seed);
   const overrides = formOverrides[seed.noun];
@@ -1499,11 +1616,13 @@ export const nouns: Noun[] = nounSeeds.map((seed, index) => {
 
   const pluralRare = pluralRareNouns.has(seed.noun);
 
+  // Шаблонні речення лишаються лише запасним варіантом, якщо для слова немає власних прикладів.
+  const examples = handwrittenNounExamples[baseNoun.id] ?? buildExamples(baseNoun);
+
   return {
     ...baseNoun,
     pluralRare,
-    // Шаблонні речення лишаються лише запасним варіантом, якщо для слова немає власних прикладів.
-    examples: handwrittenNounExamples[baseNoun.id] ?? buildExamples(baseNoun),
-    exercises: buildExercises(baseNoun, pluralRare),
+    examples,
+    exercises: [...buildExercises(baseNoun, pluralRare), ...buildNounSentenceExercises(baseNoun, handwrittenNounExamples[baseNoun.id] ?? []), ...buildPrepositionExercises(baseNoun)],
   };
 });

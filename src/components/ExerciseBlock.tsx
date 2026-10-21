@@ -5,7 +5,10 @@ import { useAnswerMode } from "../hooks/useAnswerMode";
 import { diffAnswer } from "../utils/answerDiff";
 import { isTypeable, matchAnswer, type MatchResult } from "../utils/answerMatch";
 import { adaptQuestion } from "../utils/questionText";
+import { useSpeech } from "../hooks/useSpeech";
+import ErrorFinder from "./ErrorFinder";
 import SpeakButton from "./SpeakButton";
+import TileBuilder from "./TileBuilder";
 
 const czechLetters = ["á", "č", "ď", "é", "ě", "í", "ň", "ó", "ř", "š", "ť", "ú", "ů", "ý", "ž"];
 
@@ -23,14 +26,26 @@ export default function ExerciseBlock({ exercise, index, onAnswer, shortcuts = f
   const [typedDraft, setTypedDraft] = useState("");
   const [typedResult, setTypedResult] = useState<MatchResult | "gave-up" | null>(null);
   const [showKeys, setShowKeys] = useState(false);
+  // Відповідь у вправах із власним інтерфейсом (складання речення, пошук помилки).
+  const [customResult, setCustomResult] = useState<{ correct: boolean; given: string } | null>(null);
+  const [pickedIndex, setPickedIndex] = useState<number | null>(null);
+  const { hasCzechVoice } = useSpeech();
   const inputRef = useRef<HTMLInputElement>(null);
   const mode = useAnswerMode();
   // У змішаному режимі вводимо кожну другу вправу (1-ша, 3-тя… з вибором, 2-га, 4-та… з введенням):
   // розминка вибором, потім пригадування. Нетипові для вводу вправи завжди лишаються з вибором.
   const wantsTyping = mode === "typing" || (mode === "mixed" && index % 2 === 1);
   const useTyping = wantsTyping && isTypeable(exercise.correctAnswer);
-  const isAnswered = selectedAnswer !== null || typedResult !== null;
-  const isCorrect = typedResult !== null ? typedResult === "exact" || typedResult === "no-diacritics" : selectedAnswer === exercise.correctAnswer;
+  const kind = exercise.kind;
+  const isError = kind === "error";
+  const useTiles = (kind === "build" || kind === "dictation") && !useTyping;
+  const isAnswered = selectedAnswer !== null || typedResult !== null || customResult !== null;
+  const isCorrect =
+    customResult !== null
+      ? customResult.correct
+      : typedResult !== null
+        ? typedResult === "exact" || typedResult === "no-diacritics"
+        : selectedAnswer === exercise.correctAnswer;
 
   // Fisher–Yates: правильна відповідь не повинна завжди стояти першою.
   const options = useMemo(() => {
@@ -49,6 +64,10 @@ export default function ExerciseBlock({ exercise, index, onAnswer, shortcuts = f
   // повертаємо текст лише якщо в ньому немає кирилиці; для решти вправ (граматичні терміни,
   // переклад на українську) кнопки немає.
   const listenText = useMemo(() => {
+    if (exercise.audio) {
+      return exercise.audio;
+    }
+
     const hasCyrillic = (text: string) => /[Ѐ-ӿ]/.test(text);
     const correct = exercise.correctAnswer;
     const title = exercise.question.split("\n")[0];
@@ -80,7 +99,7 @@ export default function ExerciseBlock({ exercise, index, onAnswer, shortcuts = f
     }
 
     return "";
-  }, [exercise.correctAnswer, exercise.question]);
+  }, [exercise.audio, exercise.correctAnswer, exercise.question]);
 
   const handleAnswer = (answer: string) => {
     if (isAnswered) {
@@ -130,7 +149,15 @@ export default function ExerciseBlock({ exercise, index, onAnswer, shortcuts = f
       return;
     }
 
-    const result = matchAnswer(typedDraft, exercise.correctAnswer, exercise.options);
+    let result = matchAnswer(typedDraft, exercise.correctAnswer, exercise.options);
+
+    // Інший правильний варіант (наприклад, без займенника): «Jedu domů» замість «Já jedu domů».
+    for (const alternative of exercise.acceptable ?? []) {
+      if (result === "wrong") {
+        result = matchAnswer(typedDraft, alternative, []);
+      }
+    }
+
     setTypedResult(result);
     onAnswer(result !== "wrong", typedDraft.trim());
   };
@@ -140,6 +167,36 @@ export default function ExerciseBlock({ exercise, index, onAnswer, shortcuts = f
       setTypedResult("gave-up");
       onAnswer(false, "");
     }
+  };
+
+  const giveUpCustom = () => {
+    if (!isAnswered) {
+      setCustomResult({ correct: false, given: "" });
+      onAnswer(false, "");
+    }
+  };
+
+  // Складене з плиток речення порівнюється так само, як введене: без регістру й кінцевої крапки.
+  const submitTiles = (sentence: string) => {
+    if (isAnswered) {
+      return;
+    }
+
+    const same = (candidate: string) => matchAnswer(sentence, candidate, []) !== "wrong";
+    const correct = same(exercise.correctAnswer) || (exercise.acceptable ?? []).some(same);
+    setCustomResult({ correct, given: sentence });
+    onAnswer(correct, sentence);
+  };
+
+  const pickWord = (position: number) => {
+    if (isAnswered) {
+      return;
+    }
+
+    const correct = (exercise.errorIndexes ?? []).includes(position);
+    setPickedIndex(position);
+    setCustomResult({ correct, given: (exercise.tokens ?? [])[position] ?? "" });
+    onAnswer(correct, (exercise.tokens ?? [])[position] ?? "");
   };
 
   const insertLetter = (letter: string) => {
@@ -167,7 +224,24 @@ export default function ExerciseBlock({ exercise, index, onAnswer, shortcuts = f
             </div>
           ) : null}
 
-          {useTyping ? (
+          {kind === "dictation" ? (
+            <div className="mt-3 flex flex-wrap items-center gap-3 rounded-md bg-slate-50 px-3 py-2">
+              {hasCzechVoice && exercise.audio ? (
+                <>
+                  <SpeakButton text={exercise.audio} label="Прослухати речення" className="h-11 w-11 border border-slate-300 bg-white" />
+                  <span className="text-sm font-medium text-slate-800">Натисніть, щоб послухати речення (можна повторити)</span>
+                </>
+              ) : (
+                <span className="text-sm text-slate-800">Озвучення недоступне на цьому пристрої. Складіть речення за перекладом: {exercise.hint}</span>
+              )}
+            </div>
+          ) : null}
+
+          {isError ? (
+            <ErrorFinder tokens={exercise.tokens ?? []} errorIndexes={exercise.errorIndexes ?? []} selected={pickedIndex} onSelect={pickWord} onGiveUp={giveUpCustom} />
+          ) : useTiles ? (
+            <TileBuilder key={exercise.correctAnswer} tokens={exercise.tokens ?? []} disabled={isAnswered} onSubmit={submitTiles} onGiveUp={giveUpCustom} />
+          ) : useTyping ? (
             <form onSubmit={submitTyped} className="mt-4 space-y-2">
               <label className="block text-sm font-medium text-slate-700" htmlFor={"answer-" + index}>
                 Ваша відповідь чеською
@@ -273,11 +347,13 @@ export default function ExerciseBlock({ exercise, index, onAnswer, shortcuts = f
             >
               {isCorrect ? <CheckCircle2 size={18} aria-hidden="true" /> : <XCircle size={18} aria-hidden="true" />}
               <span>
-                {typedResult === "no-diacritics"
-                  ? "Правильно, але зверніть увагу на діакритику: " + exercise.correctAnswer
-                  : isCorrect
-                    ? "Правильно"
-                    : "Неправильно. Правильна відповідь: " + exercise.correctAnswer}
+                {isError
+                  ? (isCorrect ? "Правильно. " : "Неправильно. ") + "Помилка у слові «" + exercise.correctAnswer + "». Правильне речення: " + exercise.answerText
+                  : typedResult === "no-diacritics"
+                    ? "Правильно, але зверніть увагу на діакритику: " + exercise.correctAnswer
+                    : isCorrect
+                      ? "Правильно"
+                      : "Неправильно. Правильна відповідь: " + exercise.correctAnswer}
               </span>
             </div>
           ) : null}

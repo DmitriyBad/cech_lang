@@ -1,5 +1,6 @@
 import type { Example, Exercise, Verb } from "../types/Verb";
 import { extraVerbExamples } from "./verbExamples";
+import { buildDictationExercise, buildErrorExercise, buildSentenceExercise, coreWord, isBuildable, tokenize } from "./sentenceExercises";
 
 type VerbSeed = Omit<Verb, "exercises">;
 type ConjugationKey = keyof Verb["conjugation"];
@@ -25,6 +26,61 @@ const pickAlternatives = (correctAnswer: string, candidates: string[], count = 2
 
 // 3 оригінальні + 4 додаткові речення різної будови (3-я особа, ввічливе питання, заперечення, інша конструкція).
 const buildExamples = (verb: VerbSeed): Example[] => [...verb.examples, ...(extraVerbExamples[verb.id] ?? [])];
+
+// Займенник підмета в реченні й форми, які йому відповідають (для вправи «знайдіть помилку»).
+const subjectPronouns: Array<{ words: string[]; key: ConjugationKey; label: string; wrongKeys: ConjugationKey[] }> = [
+  { words: ["já"], key: "ja", label: "já", wrongKeys: ["ty", "on", "my"] },
+  { words: ["ty"], key: "ty", label: "ty", wrongKeys: ["ja", "on", "vy"] },
+  { words: ["on", "ona", "ono"], key: "on", label: "on / ona / ono", wrongKeys: ["ja", "my", "ty"] },
+  { words: ["my"], key: "my", label: "my", wrongKeys: ["vy", "on", "ja"] },
+  { words: ["vy"], key: "vy", label: "vy", wrongKeys: ["my", "on", "ty"] },
+  { words: ["oni", "ony"], key: "oni", label: "oni / ony", wrongKeys: ["on", "ja", "my"] },
+];
+
+// Речення про одне дієслово: складання, диктант і пошук помилки в узгодженні особи.
+const buildSentenceExercises = (verb: VerbSeed): Exercise[] => {
+  const pool = buildExamples(verb).filter((example) => isBuildable(example.cz));
+  const exercises: Exercise[] = pool.slice(0, 2).map(buildSentenceExercise);
+
+  if (pool.length > 0) {
+    exercises.push(buildDictationExercise(pool[Math.min(2, pool.length - 1)]));
+  }
+
+  for (const example of pool) {
+    const tokens = tokenize(example.cz);
+    const pronoun = subjectPronouns.find((item) => tokens.some((token) => item.words.includes(coreWord(token))));
+
+    if (!pronoun) {
+      continue;
+    }
+
+    const validForms = [verb.conjugation[pronoun.key], verb.formalForms?.[pronoun.key]].filter(Boolean).map((form) => String(form).toLowerCase());
+    const position = tokens.findIndex((token) => validForms.includes(coreWord(token)));
+
+    if (position < 0) {
+      continue;
+    }
+
+    const wrongKey = pronoun.wrongKeys.find((key) => !validForms.includes(verb.conjugation[key].toLowerCase()) && !tokens.some((token) => coreWord(token) === verb.conjugation[key].toLowerCase()));
+
+    if (!wrongKey) {
+      continue;
+    }
+
+    const wrongTokens = [...tokens];
+    wrongTokens[position] = tokens[position].replace(coreWord(tokens[position]), verb.conjugation[wrongKey]).replace(/^./, (char) => (position === 0 ? char.toUpperCase() : char));
+    const exercise = buildErrorExercise(example, wrongTokens.join(" "), [
+      "Після «" + pronoun.label + "» дієслово " + verb.infinitive + " має форму «" + verb.conjugation[pronoun.key] + "», а не «" + verb.conjugation[wrongKey] + "».",
+    ]);
+
+    if (exercise) {
+      exercises.push(exercise);
+      break;
+    }
+  }
+
+  return exercises;
+};
 
 const buildExercises = (verb: VerbSeed, allVerbs: VerbSeed[]): Exercise[] => {
   const exerciseExamples = verb.examples.slice(0, 3);
@@ -108,7 +164,7 @@ const buildExercises = (verb: VerbSeed, allVerbs: VerbSeed[]): Exercise[] => {
     },
   ];
 
-  return [...conjugationExercises, ...translationExercises, ...reverseTranslationExercises, ...meaningExercises];
+  return [...conjugationExercises, ...translationExercises, ...reverseTranslationExercises, ...meaningExercises, ...buildSentenceExercises(verb)];
 };
 
 const verbBase = [

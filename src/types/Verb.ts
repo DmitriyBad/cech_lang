@@ -3,12 +3,30 @@ export interface Example {
   ua: string;
 }
 
+// Тип вправи: без `kind` це звичайний вибір із варіантів (або введення відповіді).
+// build — скласти речення зі слів (або написати); dictation — те саме, але речення треба спершу почути;
+// error — знайти слово з помилкою; speak — прочитати речення вголос.
+export type ExerciseKind = "build" | "dictation" | "error" | "speak";
+
 export interface Exercise {
   question: string;
   options: string[];
   correctAnswer: string;
   /** Коротке пояснення, яке показується після відповіді. */
   explanation?: string[];
+  kind?: ExerciseKind;
+  /** build, dictation, error: слова речення в правильному порядку (для error: речення з помилкою). */
+  tokens?: string[];
+  /** error: позиції слів із помилкою в `tokens`. */
+  errorIndexes?: number[];
+  /** Інші правильні відповіді (наприклад, речення без особового займенника). */
+  acceptable?: string[];
+  /** Чеський текст для озвучення (dictation, speak) і для кнопки «послухати» після відповіді. */
+  audio?: string;
+  /** Підказка-переклад, якщо озвучення недоступне. */
+  hint?: string;
+  /** Як показувати правильну відповідь, якщо вона не збігається з `correctAnswer` (error). */
+  answerText?: string;
 }
 
 export interface Verb {

@@ -6,9 +6,11 @@ interface SpeakButtonProps {
   /** Чеський текст для озвучення. */
   text: string;
   className?: string;
+  /** Підпис для екранних читачів. Потрібен, коли текст не можна розкривати (диктант). */
+  label?: string;
 }
 
-export default function SpeakButton({ text, className = "" }: SpeakButtonProps) {
+export default function SpeakButton({ text, className = "", label }: SpeakButtonProps) {
   const { speak, hasCzechVoice } = useSpeech();
   const [isSpeaking, setIsSpeaking] = useState(false);
   const isMounted = useRef(true);
@@ -40,7 +42,7 @@ export default function SpeakButton({ text, className = "" }: SpeakButtonProps) 
     <button
       type="button"
       onClick={handleClick}
-      aria-label={"Прослухати: " + text}
+      aria-label={label ?? "Прослухати: " + text}
       title="Прослухати"
       className={[
         "focus-ring inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md align-middle transition",

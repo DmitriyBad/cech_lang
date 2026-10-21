@@ -1,6 +1,7 @@
 import type { LessonItem, LessonModule, LessonSentence } from "../types/Lesson";
 import { firstParagraph } from "./explanations";
 import { lessonSentences } from "./lessonSentences";
+import { buildDictationExercise, buildErrorExercise, buildSentenceExercise, isBuildable } from "./sentenceExercises";
 
 const czechUi = {
   chooseWord: "Vyberte správné slovo do české věty.",
@@ -156,6 +157,30 @@ const specialStudyItemsByLessonId: Record<string, string[]> = {
 const buildStudyItems = (id: string, examples: string[]) =>
   specialStudyItemsByLessonId[id] ?? Array.from(new Set(examples)).slice(0, 8);
 
+// Вправи на цілі речення уроку: складання, диктант і пошук хибної форми (`wrong` замість `focus`).
+const buildSentenceSetExercises = (sentences: LessonSentence[], rule: string) => {
+  const pool = sentences.filter((sentence) => isBuildable(sentence.cz));
+  const exercises = pool.slice(0, 2).map(buildSentenceExercise);
+
+  if (pool.length > 0) {
+    exercises.push(buildDictationExercise(pool[Math.min(2, pool.length - 1)]));
+  }
+
+  for (const sentence of pool) {
+    const exercise = buildErrorExercise(sentence, sentence.cz.replace(sentence.focus, sentence.wrong[0]), [
+      "Правильна форма: «" + sentence.focus + "», а не «" + sentence.wrong[0] + "».",
+      "Правило: " + rule,
+    ]);
+
+    if (exercise) {
+      exercises.push(exercise);
+      break;
+    }
+  }
+
+  return exercises;
+};
+
 const buildLesson = (
   id: string,
   title: string,
@@ -178,7 +203,11 @@ const buildLesson = (
     explanation,
     studyItems: buildStudyItems(id, seedExamples),
     examples: sentences.map(({ cz, ua }) => ({ cz, ua })),
-    exercises: [...buildClozeExercises(title, sentences, firstParagraph(explanation)), ...buildTranslationExercises(sentences, title, firstParagraph(explanation))],
+    exercises: [
+      ...buildClozeExercises(title, sentences, firstParagraph(explanation)),
+      ...buildTranslationExercises(sentences, title, firstParagraph(explanation)),
+      ...buildSentenceSetExercises(sentences, firstParagraph(explanation)),
+    ],
   };
 };
 
