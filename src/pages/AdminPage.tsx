@@ -21,8 +21,10 @@ const formatDate = (value: string) => new Date(value).toLocaleDateString("uk-UA"
 
 // Ключ відповіді «v:12» читається як «дієслово 12» тощо.
 const describeKey = (key: string) => {
-  const [kind, id] = key.split(":");
-  return (kind === "v" ? "Дієслово #" : kind === "n" ? "Іменник #" : "Урок ") + id;
+  const separator = key.indexOf(":");
+  const kind = key.slice(0, separator);
+  const id = key.slice(separator + 1);
+  return (kind === "v" ? "Дієслово #" : kind === "n" ? "Іменник #" : kind === "sp" ? "Говоримо: " : "Урок ") + id;
 };
 
 function Table({ caption, head, rows }: { caption: string; head: string[]; rows: Array<Array<string | number>> }) {

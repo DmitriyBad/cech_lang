@@ -16,6 +16,7 @@ import NounPage from "./pages/NounPage";
 import NounRulesPage from "./pages/NounRulesPage";
 import NounsPage from "./pages/NounsPage";
 import ProfilePage from "./pages/ProfilePage";
+import SpeakPage from "./pages/SpeakPage";
 import PracticePage from "./pages/PracticePage";
 import PhrasesPage from "./pages/PhrasesPage";
 import PronunciationPage from "./pages/PronunciationPage";
@@ -67,6 +68,7 @@ export default function App() {
           <Route path="/start/pronunciation" element={<PronunciationPage />} />
           <Route path="/start/phrases" element={<PhrasesPage />} />
           <Route path="/practice" element={<PracticePage />} />
+          <Route path="/practice/speak" element={<SpeakPage />} />
           <Route path="/statistics" element={<StatisticsPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

@@ -131,6 +131,13 @@ export default function PracticePage() {
               </button>
             );
           })}
+          <Link
+            to="/practice/speak"
+            className="focus-ring flex min-h-24 flex-col items-start justify-between rounded-lg border border-slate-200 bg-white p-4 text-left shadow-soft transition hover:border-blue-300 hover:bg-blue-50"
+          >
+            <span className="text-lg font-bold text-slate-950">Говоримо</span>
+            <span className="text-sm text-slate-600">Читайте речення вголос, браузер перевірить. Потрібен мікрофон, Chrome або Edge</span>
+          </Link>
         </section>
 
         {cardTotal > 0 ? (

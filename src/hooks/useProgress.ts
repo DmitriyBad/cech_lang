@@ -132,7 +132,7 @@ export function useProgress(totalVerbs = 0) {
 
   const registerModuleAnswer = useCallback(
     (moduleId: string, itemId: string, isCorrect: boolean) => {
-      track("answer", undefined, { correct: isCorrect, key: (moduleId === "nouns" ? "n:" : "l:") + itemId });
+      track("answer", undefined, { correct: isCorrect, key: (moduleId === "nouns" ? "n:" : moduleId === "speaking" ? "sp:" : "l:") + itemId });
       updateProgress((current) => {
         const currentModule = current.moduleProgress[moduleId] ?? {
           completedItemIds: [],
@@ -145,7 +145,8 @@ export function useProgress(totalVerbs = 0) {
           ...current,
           correctAnswers: current.correctAnswers + (isCorrect ? 1 : 0),
           wrongAnswers: current.wrongAnswers + (isCorrect ? 0 : 1),
-          srs: updateSrs(current.srs, (moduleId === "nouns" ? "n:" : "l:") + itemId, isCorrect),
+          // Читання вголос не має карток повторення: речення не є словом чи уроком.
+          srs: moduleId === "speaking" ? current.srs : updateSrs(current.srs, (moduleId === "nouns" ? "n:" : "l:") + itemId, isCorrect),
           moduleProgress: {
             ...current.moduleProgress,
             [moduleId]: {

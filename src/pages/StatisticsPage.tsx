@@ -36,6 +36,7 @@ export default function StatisticsPage() {
     { id: "nouns", title: "Іменники", ...getModuleStats("nouns", nouns.length) },
     ...grammarModules.map((module) => ({ id: module.id, title: module.title, ...getModuleStats(module.id, module.lessons.length) })),
   ];
+  const speaking = progress.moduleProgress.speaking;
 
   return (
     <div className="space-y-6">
@@ -96,6 +97,14 @@ export default function StatisticsPage() {
               </p>
             </article>
           ))}
+          {speaking && speaking.correctAnswers + speaking.wrongAnswers > 0 ? (
+            <article className="rounded-lg border border-slate-200 bg-white p-4 shadow-soft">
+              <h3 className="font-semibold text-slate-950">Говоримо (читання вголос)</h3>
+              <p className="mt-3 text-xs text-slate-500">
+                Вдалося: {speaking.correctAnswers} · Не вдалося: {speaking.wrongAnswers}
+              </p>
+            </article>
+          ) : null}
         </div>
       </section>
 

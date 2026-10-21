@@ -95,3 +95,15 @@ describe("spaced repetition topic", () => {
     expect(ids.map((id) => id.split(":").slice(0, 2).join(":"))).toEqual(["v:3", "n:5"]);
   });
 });
+
+describe("speaking results", () => {
+  it("do not leak into mistakes or due practice", () => {
+    const progress = {
+      ...emptyProgress,
+      moduleProgress: { speaking: { completedItemIds: [], correctAnswers: 1, wrongAnswers: 2, mistakesByItemId: { "v12:Maminka dá dítěti čaj.": 2 } } },
+    };
+
+    expect(mistakeSources(progress)).toEqual([]);
+    expect(dueSources(progress)).toEqual([]);
+  });
+});
