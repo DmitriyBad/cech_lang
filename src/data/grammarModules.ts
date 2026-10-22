@@ -1,7 +1,10 @@
 import type { LessonItem, LessonModule, LessonSentence } from "../types/Lesson";
 import { firstParagraph } from "./explanations";
-import { lessonSentences } from "./lessonSentences";
+import { lessonSentences as baseLessonSentences } from "./lessonSentences";
+import { moreLessonSentences, moreModuleDefs, moreReferences } from "./moreGrammar";
 import { buildDictationExercise, buildErrorExercise, buildSentenceExercise, isBuildable } from "./sentenceExercises";
+
+const lessonSentences: Record<string, LessonSentence[]> = { ...baseLessonSentences, ...moreLessonSentences };
 
 const czechUi = {
   chooseWord: "Vyberte správné slovo do české věty.",
@@ -107,6 +110,7 @@ const numberReferenceItems = [
 ];
 
 const moduleReferences: Record<string, { referenceTitle: string; referenceItems: string[] }> = {
+  ...moreReferences,
   tenses: {
     referenceTitle: "Минулий і майбутній час: допоміжні дієслова",
     referenceItems: [
@@ -751,7 +755,16 @@ const rawModules = [
   }
 ];
 
-export const grammarModules: LessonModule[] = rawModules.map((module) => ({
+// Нові модулі додаємо в кінець: порядок наявних модулів і уроків визначає id вправ у «Тренуванні».
+const allRawModules = [
+  ...rawModules,
+  ...moreModuleDefs.map((module) => ({
+    ...module,
+    lessons: module.lessons.map((lesson) => [...lesson, lessonSentences[lesson[0]].slice(0, 4).map((sentence) => sentence.cz)]),
+  })),
+];
+
+export const grammarModules: LessonModule[] = allRawModules.map((module) => ({
   ...module,
   ...moduleReferences[String(module.id)],
   lessons: module.lessons.map(([id, title, subtitle, level, explanation, examples]) =>

@@ -116,14 +116,14 @@ const unit = (
 });
 
 export const courseUnits: CourseUnit[] = [
-  unit("u1", "A1", "Знайомство", "Привітатися, розповісти про себе, лічити до десяти.", ["scenario-intro", "numbers-0-10", "tenses-present-a"], 0),
-  unit("u2", "A1", "Щодня", "Говорити про звичайні дії, дні й місяці.", ["tenses-present-i", "tenses-present-uju", "numbers-11-20", "numbers-tens", "time-days", "time-months"], 1),
+  unit("u1", "A1", "Знайомство", "Привітатися, розповісти про себе, лічити до десяти.", ["scenario-intro", "pron-personal", "pron-question", "numbers-0-10", "tenses-present-a"], 0),
+  unit("u2", "A1", "Щодня", "Говорити про звичайні дії, дні й місяці.", ["tenses-present-i", "tenses-present-uju", "order-basic", "order-conjunctions", "numbers-11-20", "numbers-tens", "time-days", "time-months"], 1),
   unit(
     "u3",
     "A1",
     "Опис і кількість",
     "Описувати предмети та вживати множину.",
-    ["plural-masc-animate", "plural-masc-inanimate", "plural-feminine-a", "plural-feminine-e", "plural-neuter-o", "adj-gender", "adj-colors", "adj-size"],
+    ["plural-masc-animate", "plural-masc-inanimate", "plural-feminine-a", "plural-feminine-e", "plural-neuter-o", "adj-gender", "adj-colors", "adj-size", "pron-demonstrative", "pron-possessive"],
     2,
   ),
   unit(
@@ -131,23 +131,23 @@ export const courseUnits: CourseUnit[] = [
     "A1",
     "У місті",
     "Купувати, їздити, замовляти в кафе й обирати правильний відмінок після прийменників.",
-    ["prep-genitive", "prep-dative", "prep-accusative", "prep-locative", "prep-instrumental", "scenario-shop", "scenario-transport", "scenario-cafe", "time-clock-basic", "numbers-prices"],
+    ["prep-genitive", "prep-dative", "prep-accusative", "prep-locative", "prep-instrumental", "scenario-shop", "scenario-transport", "scenario-cafe", "order-questions", "dialog-cafe", "dialog-shop", "dialog-directions", "dialog-restaurant", "time-clock-basic", "numbers-prices"],
     3,
   ),
-  unit("u5", "A1", "Було й буде", "Розповісти, що сталося вчора і що буде завтра.", ["tenses-past-form", "tenses-past-gender", "tenses-future-budu", "tenses-choose", "numbers-age", "numbers-phone", "time-meetings"], 4),
+  unit("u5", "A1", "Було й буде", "Розповісти, що сталося вчора і що буде завтра.", ["tenses-past-form", "tenses-past-gender", "tenses-future-budu", "tenses-choose", "pron-accusative", "pron-dative", "dialog-phone", "numbers-age", "numbers-phone", "time-meetings"], 4),
   unit(
     "u6",
     "A2",
     "Складніші часи",
     "Неправильні форми, заперечення, доконані дієслова.",
-    ["tenses-past-irregular", "tenses-past-neg-refl", "tenses-future-perfective", "tenses-future-motion", "tenses-future-neg-refl", "prep-vs-direction-place"],
+    ["tenses-past-irregular", "tenses-past-neg-refl", "tenses-future-perfective", "tenses-future-motion", "tenses-future-neg-refl", "prep-vs-direction-place", "order-negation", "order-clitics"],
   ),
   unit(
     "u7",
     "A2",
     "Життя в Чехії",
     "Лікар, робота, житло, подорож; дати, години й порівняння.",
-    ["plural-neuter-i", "numbers-hundreds", "time-half-quarter", "time-dates", "adj-plural", "adj-cases", "adj-comparison", "scenario-doctor", "scenario-work", "scenario-housing", "scenario-travel"],
+    ["plural-neuter-i", "numbers-hundreds", "time-half-quarter", "time-dates", "adj-plural", "adj-cases", "adj-comparison", "scenario-doctor", "scenario-work", "scenario-housing", "scenario-travel", "dialog-doctor"],
   ),
 ];
 
